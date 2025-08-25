@@ -1,3 +1,16 @@
+import java.util.Properties
+
+// Properties 객체를 생성해 key-value 쌍을 저장할 준비를 한다
+val properties = Properties()
+// 프로젝트의 루트 디렉토리에 있는 local.properties 파일을 가져온다
+val propertiesFile = project.rootProject.file("local.properties")
+// 파일이 존재하는지 확인 후 로드
+if (propertiesFile.exists()) {
+    // 파일의 InputStream을 열어 속성값을 안전하게 불러온다
+    // use 함수를 사용하면 스트림이 자동으로 닫힌다
+    propertiesFile.inputStream().use { properties.load(it) }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -17,6 +30,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 네이티브 앱 키를 BuildConfig에 필드로 추가
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"${properties.getProperty("kakao.native.app.key")}\"")
     }
 
     buildTypes {
@@ -37,6 +53,8 @@ android {
     }
     buildFeatures {
         compose = true
+        // BuildConfig 파일 생성을 활성화
+        buildConfig = true
     }
 }
 
@@ -56,6 +74,8 @@ dependencies {
     // firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    // kakao
+    implementation(libs.kakao.sdk)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
