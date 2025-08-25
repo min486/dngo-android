@@ -31,8 +31,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        val kakaoNativeAppKey = properties.getProperty("kakao.native.app.key")
+
         // 네이티브 앱 키를 BuildConfig에 필드로 추가
-        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"${properties.getProperty("kakao.native.app.key")}\"")
+        buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"${kakaoNativeAppKey}\"")
+        // AndroidManifest.xml에 전달할 플레이스홀더 정의
+        manifestPlaceholders["kakaoNativeAppKey"] = kakaoNativeAppKey
     }
 
     buildTypes {
