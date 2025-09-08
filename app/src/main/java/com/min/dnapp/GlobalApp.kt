@@ -1,4 +1,4 @@
-package com.min.dngo
+package com.min.dnapp
 
 import android.app.Application
 import com.kakao.sdk.common.KakaoSdk

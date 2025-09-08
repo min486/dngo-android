@@ -1,4 +1,4 @@
-package com.min.dngo
+package com.min.dnapp
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -19,7 +19,7 @@ plugins {
 }
 
 android {
-    namespace = "com.min.dngo"
+    namespace = "com.min.dnapp"
     compileSdk = 36
 
     defaultConfig {

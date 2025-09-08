@@ -1,4 +1,4 @@
-package com.min.dngo.ui.theme
+package com.min.dnapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

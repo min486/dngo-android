@@ -1,4 +1,4 @@
-package com.min.dngo
+package com.min.dnapp
 
 import android.content.Context
 import android.os.Bundle
@@ -19,7 +19,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kakao.sdk.user.UserApiClient
-import com.min.dngo.ui.theme.DngoTheme
+import com.min.dnapp.ui.theme.DngoTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
