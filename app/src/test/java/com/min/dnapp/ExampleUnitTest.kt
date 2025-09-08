@@ -1,4 +1,4 @@
-package com.min.dngo
+package com.min.dnapp
 
 import org.junit.Test
 
