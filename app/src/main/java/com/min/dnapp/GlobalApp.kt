@@ -2,7 +2,9 @@ package com.min.dnapp
 
 import android.app.Application
 import com.kakao.sdk.common.KakaoSdk
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class GlobalApp : Application() {
     override fun onCreate() {
         super.onCreate()

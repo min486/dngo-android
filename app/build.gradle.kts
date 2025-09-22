@@ -16,6 +16,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -23,7 +25,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.min.dngo"
+        applicationId = "com.min.dnapp"
         minSdk = 30
         targetSdk = 36
         versionCode = 1
@@ -82,6 +84,12 @@ dependencies {
     implementation(libs.firebase.firestore)
     // kakao
     implementation(libs.kakao.sdk)
+    // compose navigation
+    implementation(libs.androidx.navigation.compose)
+    // hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
