@@ -19,7 +19,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kakao.sdk.user.UserApiClient
-import com.min.dnapp.ui.theme.DngoTheme
+import com.min.dnapp.presentation.ui.home.HomeScreen
+import com.min.dnapp.presentation.ui.theme.DngoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -29,7 +30,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DngoTheme {
-                LoginScreen()
+//                LoginScreen()
+                HomeScreen()
             }
         }
     }
