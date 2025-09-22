@@ -1,4 +1,4 @@
-package com.min.dnapp.ui.theme
+package com.min.dnapp.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
