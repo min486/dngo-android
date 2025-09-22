@@ -23,7 +23,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.min.dngo"
+        applicationId = "com.min.dnapp"
         minSdk = 30
         targetSdk = 36
         versionCode = 1
@@ -82,6 +82,8 @@ dependencies {
     implementation(libs.firebase.firestore)
     // kakao
     implementation(libs.kakao.sdk)
+    // compose navigation
+    implementation(libs.androidx.navigation.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
