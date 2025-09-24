@@ -1,20 +1,20 @@
 package com.min.dnapp.data.di
 
-import com.min.dnapp.data.repository.TripRepositoryImpl
-import com.min.dnapp.domain.repository.TripRepository
+import com.min.dnapp.data.repository.AuthRepositoryImpl
+import com.min.dnapp.domain.repository.AuthRepository
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RepositoryModule {
+abstract class RepositoryModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideTripRepository(): TripRepository {
-        return TripRepositoryImpl()
-    }
+    abstract fun bindAuthRepository(
+        authRepositoryImpl: AuthRepositoryImpl
+    ): AuthRepository
 }
