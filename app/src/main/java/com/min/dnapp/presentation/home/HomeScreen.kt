@@ -60,6 +60,26 @@ fun HomeScreen(
             ) {
                 Text("로그아웃")
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    loginViewModel.onUnlinkClicked(
+                        onSuccess = {
+                            Toast.makeText(context, "회원탈퇴 성공", Toast.LENGTH_SHORT).show()
+                            navController.navigate("login") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        },
+                        onFailure = {
+                            Toast.makeText(context, "회원탈퇴 실패 : ${it.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
+            ) {
+                Text("회원탈퇴")
+            }
         }
     }
 }

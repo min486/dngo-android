@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.min.dnapp.domain.model.UserProfile
 import com.min.dnapp.domain.usecase.LogoutUseCase
 import com.min.dnapp.domain.usecase.SignInWithKakaoUseCase
+import com.min.dnapp.domain.usecase.UnlinkUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val signInWithKakaoUseCase: SignInWithKakaoUseCase,
-    private val logoutUseCase: LogoutUseCase
+    private val logoutUseCase: LogoutUseCase,
+    private val unlinkUseCase: UnlinkUseCase
 ) : ViewModel() {
 
     // 로그인 결과 저장
@@ -58,6 +60,24 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val result = logoutUseCase()
+                result.onSuccess {
+                    onSuccess()
+                }.onFailure { exception ->
+                    onFailure(exception)
+                }
+            } catch (e: Exception) {
+                onFailure(e)
+            }
+        }
+    }
+
+    /**
+     * 회원탈퇴 버튼 클릭 시 호출
+     */
+    fun onUnlinkClicked(onSuccess: () -> Unit, onFailure: (Throwable) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val result = unlinkUseCase()
                 result.onSuccess {
                     onSuccess()
                 }.onFailure { exception ->

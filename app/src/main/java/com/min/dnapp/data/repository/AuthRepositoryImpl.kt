@@ -62,6 +62,41 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun unlinkUser(): Result<Unit> = suspendCancellableCoroutine { continuation ->
+        val firebaseUser = firebaseAuth.currentUser
+        if (firebaseUser == null) {
+            continuation.resumeWith(Result.failure(Exception("로그인된 사용자가 없습니다")))
+            return@suspendCancellableCoroutine
+        }
+
+        // firebase auth 사용자 삭제
+        firebaseUser.delete()
+            .addOnCompleteListener { authTask ->
+                Log.d("AuthRepository", "firebase 계정 삭제 성공")
+                if (authTask.isSuccessful) {
+                    // firestore 문서 삭제
+                    firestore.collection("users").document(firebaseUser.uid).delete()
+                        .addOnSuccessListener {
+                            Log.d("AuthRepository", "firestore 문서 삭제 성공")
+                            // 카카오 연결 끊기
+                            UserApiClient.instance.unlink { unlinkError ->
+                                if (unlinkError != null) {
+                                    continuation.resumeWith(Result.failure(unlinkError))
+                                } else {
+                                    continuation.resumeWith(Result.success(Result.success(Unit)))
+                                    Log.d("AuthRepository", "카카오 연결 끊기 성공")
+                                }
+                            }
+                        }
+                        .addOnFailureListener { firestoreException ->
+                            continuation.resumeWith(Result.failure(firestoreException))
+                        }
+                } else {
+                    continuation.resumeWith(Result.failure(authTask.exception ?: Exception("firebase 계정 삭제 실패")))
+                }
+            }
+    }
+
     // 카카오 로그인 결과를 처리
     private fun handleKakaoLoginResult(
         token: OAuthToken?,
