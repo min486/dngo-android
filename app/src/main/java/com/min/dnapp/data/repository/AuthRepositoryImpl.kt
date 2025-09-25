@@ -41,6 +41,27 @@ class AuthRepositoryImpl @Inject constructor(
 
         }
 
+    /**
+     * 로그아웃 처리
+     * - 카카오 SDK 로그아웃
+     * - firebase auth 로그아웃
+     */
+    override suspend fun logout(): Result<Unit> = suspendCancellableCoroutine { continuation ->
+        // 카카오 SDK 로그아웃
+        UserApiClient.instance.logout { error ->
+            if (error != null) {
+                Log.e("AuthRepository", "카카오 로그아웃 실패", error)
+                continuation.resumeWith(Result.failure(error))
+                return@logout
+            }
+
+            // firebase auth 로그아웃
+            firebaseAuth.signOut()
+            continuation.resumeWith(Result.success(Result.success(Unit)))
+            Log.d("AuthRepository", "카카오 & firebase 로그아웃 성공")
+        }
+    }
+
     // 카카오 로그인 결과를 처리
     private fun handleKakaoLoginResult(
         token: OAuthToken?,
