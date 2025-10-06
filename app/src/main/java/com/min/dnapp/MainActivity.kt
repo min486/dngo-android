@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import com.min.dnapp.presentation.AppStartViewModel
 import com.min.dnapp.presentation.home.HomeScreen
 import com.min.dnapp.presentation.login.LoginScreen
+import com.min.dnapp.presentation.login.LoginScreen2
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,10 +25,11 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         setContent {
             DngoTheme {
-                MomentoApp()
+//                MomentoApp()
+                LoginScreen2()
             }
         }
     }
