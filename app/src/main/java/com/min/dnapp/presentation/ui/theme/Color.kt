@@ -37,3 +37,6 @@ val Gray_W80 = Color(0xFFCCCCCC)
 val Gray_W90 = Color(0xFFE5E5E5)
 val Black = Color(0xFF000000)
 val White = Color(0xFFFFFFFF)
+
+// 기타
+val KakaoYellow = Color(0xFFFEE500)
