@@ -7,8 +7,9 @@
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 
-    <style name="Theme.Dngo.SplashScreen" parent="Theme.Dngo">
-        <item name="android:windowBackground">@drawable/splash_layer_list</item>
+    <style name="Theme.Dngo.SplashScreen" parent="Theme.SplashScreen">
+        <item name="android:windowSplashScreenBackground">@color/bg_splash</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/logo_splash</item>
         <item name="postSplashScreenTheme">@style/Theme.Dngo</item>
     </style>
 </resources>
