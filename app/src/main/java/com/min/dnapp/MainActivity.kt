@@ -22,6 +22,7 @@ import com.min.dnapp.presentation.login.LoginScreen2
 import com.min.dnapp.presentation.onboarding.OnboardingScreen
 import com.min.dnapp.presentation.onboarding.OnboardingScreen2
 import com.min.dnapp.presentation.onboarding.OnboardingScreen3
+import com.min.dnapp.presentation.profile.ProfileSetupScreen
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,7 +40,8 @@ class MainActivity : ComponentActivity() {
 //                LoginScreen2()
 //                OnboardingScreen()
 //                OnboardingScreen2()
-                OnboardingScreen3()
+//                OnboardingScreen3()
+                ProfileSetupScreen()
             }
         }
     }
