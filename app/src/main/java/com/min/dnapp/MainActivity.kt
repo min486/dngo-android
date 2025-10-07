@@ -19,6 +19,9 @@ import com.min.dnapp.presentation.AppStartViewModel
 import com.min.dnapp.presentation.home.HomeScreen
 import com.min.dnapp.presentation.login.LoginScreen
 import com.min.dnapp.presentation.login.LoginScreen2
+import com.min.dnapp.presentation.onboarding.OnboardingScreen
+import com.min.dnapp.presentation.onboarding.OnboardingScreen2
+import com.min.dnapp.presentation.onboarding.OnboardingScreen3
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,7 +36,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             DngoTheme {
 //                MomentoApp()
-                LoginScreen2()
+//                LoginScreen2()
+//                OnboardingScreen()
+//                OnboardingScreen2()
+                OnboardingScreen3()
             }
         }
     }
