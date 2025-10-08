@@ -2,7 +2,9 @@ package com.min.dnapp.presentation.ui.icon
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.min.dnapp.presentation.ui.icon.appicons.Back
+import com.min.dnapp.presentation.ui.icon.appicons.Bell
 import com.min.dnapp.presentation.ui.icon.appicons.Kakao
+import com.min.dnapp.presentation.ui.icon.appicons.PenSmall
 import kotlin.collections.List as ____KtList
 
 public object AppIcons
@@ -14,6 +16,6 @@ public val AppIcons.AllIcons: ____KtList<ImageVector>
     if (__AllIcons != null) {
       return __AllIcons!!
     }
-    __AllIcons= listOf(Back, Kakao)
+    __AllIcons= listOf(Back, Bell, Kakao, PenSmall)
     return __AllIcons!!
   }
