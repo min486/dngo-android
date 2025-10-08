@@ -19,6 +19,8 @@ import com.min.dnapp.presentation.AppStartViewModel
 import com.min.dnapp.presentation.home.HomeScreen
 import com.min.dnapp.presentation.login.LoginScreen
 import com.min.dnapp.presentation.login.LoginScreen2
+import com.min.dnapp.presentation.mypage.MypageScreen
+import com.min.dnapp.presentation.mypage.SettingScreen
 import com.min.dnapp.presentation.onboarding.OnboardingScreen
 import com.min.dnapp.presentation.onboarding.OnboardingScreen2
 import com.min.dnapp.presentation.onboarding.OnboardingScreen3
@@ -41,7 +43,9 @@ class MainActivity : ComponentActivity() {
 //                OnboardingScreen()
 //                OnboardingScreen2()
 //                OnboardingScreen3()
-                ProfileSetupScreen()
+//                ProfileSetupScreen()
+//                MypageScreen()
+                SettingScreen()
             }
         }
     }
