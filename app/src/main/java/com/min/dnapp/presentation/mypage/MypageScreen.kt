@@ -25,6 +25,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -32,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.min.dnapp.R
+import com.min.dnapp.presentation.mypage.component.ProfileImageDialog
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Bell
 import com.min.dnapp.presentation.ui.icon.appicons.PenSmall
@@ -41,6 +46,9 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MypageScreen() {
+
+    var showProfileImageDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
         topBar = {
@@ -78,7 +86,9 @@ fun MypageScreen() {
         ) {
             Spacer(Modifier.height(20.dp))
 
-            MypageProfileSection()
+            MypageProfileSection(
+                onClick = { showProfileImageDialog = true }
+            )
 
             Spacer(Modifier.height(20.dp))
 
@@ -89,17 +99,26 @@ fun MypageScreen() {
             MypageMenuSection()
         }
     }
+
+    // 프로필이미지 수정 모달창
+    if (showProfileImageDialog) {
+        ProfileImageDialog(
+            onDismiss = { showProfileImageDialog = false },
+            onCancel = { showProfileImageDialog = false },
+            onConfirm = {}
+        )
+    }
 }
 
 @Composable
-fun MypageProfileSection() {
+fun MypageProfileSection(onClick: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 프로필 이미지 (수정 가능)
         UserProfileImage(
-            onClick = {}
+            onClick = { onClick() }
         )
 
         Spacer(Modifier.height(12.dp))
