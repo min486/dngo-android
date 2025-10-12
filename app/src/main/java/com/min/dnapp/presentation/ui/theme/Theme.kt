@@ -38,6 +38,13 @@ data class MomentoColors(
     val pinkB60: Color,
     val pinkB80: Color,
 
+    // secondary (green)
+    val greenW80: Color,
+    val greenW60: Color,
+    val greenW40: Color,
+    val greenW20: Color,
+    val greenBase: Color,
+
     // gray
     val grayW10: Color,
     val grayW20: Color,
@@ -75,6 +82,11 @@ private val LightColorPalette = MomentoColors(
     pinkB40 = Pink_B40,
     pinkB60 = Pink_B60,
     pinkB80 = Pink_B80,
+    greenW80 = Green_W80,
+    greenW60 = Green_W60,
+    greenW40 = Green_W40,
+    greenW20 = Green_W20,
+    greenBase = Green_Base,
     grayW10 = Gray_W10,
     grayW20 = Gray_W20,
     grayW40 = Gray_W40,

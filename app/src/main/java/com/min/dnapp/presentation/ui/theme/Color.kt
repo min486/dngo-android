@@ -28,6 +28,12 @@ val Pink_B40 = Color(0xFF8C6D64)
 val Pink_B60 = Color(0xFF5D4942)
 val Pink_B80 = Color(0xFF2F2421)
 
+val Green_W80 = Color(0xFFE2E8E3)
+val Green_W60 = Color(0xFFC5D1C7)
+val Green_W40 = Color(0xFFA8B9AC)
+val Green_W20 = Color(0xFF8BA290)
+val Green_Base = Color(0xFF6E8B74)
+
 // gray
 val Gray_W10 = Color(0xFF1B1D1F)
 val Gray_W20 = Color(0xFF333333)
