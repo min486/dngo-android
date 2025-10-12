@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -46,6 +47,7 @@ import com.min.dnapp.presentation.ui.icon.appicons.Calendar
 import com.min.dnapp.presentation.ui.icon.appicons.Gallery
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
+import com.min.dnapp.presentation.write.component.EmotionBottomSheetContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +55,8 @@ fun RecordWriteScreen() {
     val radioOptions = listOf("국내", "해외 (직접 입력)")
     var selectedPlace by remember { mutableStateOf("국내") }
     var isChecked by remember { mutableStateOf(true) }
+    var showEmotionBottomSheet by remember { mutableStateOf(false) }
+    var showWeatherBottomSheet by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
@@ -125,6 +129,7 @@ fun RecordWriteScreen() {
                 // 감정 & 날씨
                 Row {
                     Row(
+                        modifier = Modifier.clickable { showEmotionBottomSheet = true },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
@@ -312,6 +317,20 @@ fun RecordWriteScreen() {
                     )
                 }
             }
+        }
+    }
+
+    // 감정 선택 바텀시트
+    if (showEmotionBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showEmotionBottomSheet = false },
+            dragHandle = null,
+            containerColor = MomentoTheme.colors.white,
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        ) {
+            EmotionBottomSheetContent(
+                onConfirm = { showEmotionBottomSheet = false }
+            )
         }
     }
 }
