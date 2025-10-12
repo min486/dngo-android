@@ -48,6 +48,7 @@ import com.min.dnapp.presentation.ui.icon.appicons.Gallery
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 import com.min.dnapp.presentation.write.component.EmotionBottomSheetContent
+import com.min.dnapp.presentation.write.component.WeatherBottomSheetContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -153,6 +154,7 @@ fun RecordWriteScreen() {
                     }
                     Spacer(Modifier.width(20.dp))
                     Row(
+                        modifier = Modifier.clickable { showWeatherBottomSheet = true },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
@@ -330,6 +332,20 @@ fun RecordWriteScreen() {
         ) {
             EmotionBottomSheetContent(
                 onConfirm = { showEmotionBottomSheet = false }
+            )
+        }
+    }
+
+    // 날씨 선택 바텀시트
+    if (showWeatherBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showWeatherBottomSheet = false },
+            dragHandle = null,
+            containerColor = MomentoTheme.colors.white,
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        ) {
+            WeatherBottomSheetContent (
+                onConfirm = { showWeatherBottomSheet = false }
             )
         }
     }
