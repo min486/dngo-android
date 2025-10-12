@@ -27,6 +27,7 @@ import com.min.dnapp.presentation.onboarding.OnboardingScreen3
 import com.min.dnapp.presentation.profile.ProfileSetupScreen
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.write.RecordWriteScreen
+import com.min.dnapp.presentation.write.WriteFinishScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,7 +48,8 @@ class MainActivity : ComponentActivity() {
 //                ProfileSetupScreen()
 //                MypageScreen()
 //                SettingScreen()
-                RecordWriteScreen()
+//                RecordWriteScreen()
+                WriteFinishScreen()
             }
         }
     }
