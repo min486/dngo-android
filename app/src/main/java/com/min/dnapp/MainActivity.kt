@@ -3,7 +3,6 @@ package com.min.dnapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -16,18 +15,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.min.dnapp.presentation.AppStartViewModel
+import com.min.dnapp.presentation.find.FindDetailScreen
+import com.min.dnapp.presentation.find.FindScreen
 import com.min.dnapp.presentation.home.HomeScreen
 import com.min.dnapp.presentation.login.LoginScreen
-import com.min.dnapp.presentation.login.LoginScreen2
-import com.min.dnapp.presentation.mypage.MypageScreen
-import com.min.dnapp.presentation.mypage.SettingScreen
-import com.min.dnapp.presentation.onboarding.OnboardingScreen
-import com.min.dnapp.presentation.onboarding.OnboardingScreen2
-import com.min.dnapp.presentation.onboarding.OnboardingScreen3
-import com.min.dnapp.presentation.profile.ProfileSetupScreen
 import com.min.dnapp.presentation.ui.theme.DngoTheme
-import com.min.dnapp.presentation.write.RecordWriteScreen
-import com.min.dnapp.presentation.write.WriteFinishScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -49,7 +41,9 @@ class MainActivity : ComponentActivity() {
 //                MypageScreen()
 //                SettingScreen()
 //                RecordWriteScreen()
-                WriteFinishScreen()
+//                WriteFinishScreen()
+//                FindScreen()
+                FindDetailScreen()
             }
         }
     }
