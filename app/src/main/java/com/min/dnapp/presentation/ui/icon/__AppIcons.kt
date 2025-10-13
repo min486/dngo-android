@@ -7,6 +7,7 @@ import com.min.dnapp.presentation.ui.icon.appicons.Calendar
 import com.min.dnapp.presentation.ui.icon.appicons.Delete
 import com.min.dnapp.presentation.ui.icon.appicons.Gallery
 import com.min.dnapp.presentation.ui.icon.appicons.Kakao
+import com.min.dnapp.presentation.ui.icon.appicons.More
 import com.min.dnapp.presentation.ui.icon.appicons.PenSmall
 import com.min.dnapp.presentation.ui.icon.appicons.RecordBest
 import com.min.dnapp.presentation.ui.icon.appicons.RecordBookmark
@@ -24,7 +25,7 @@ public val AppIcons.AllIcons: ____KtList<ImageVector>
     if (__AllIcons != null) {
       return __AllIcons!!
     }
-    __AllIcons= listOf(Back, Bell, Calendar, Delete, Gallery, Kakao, PenSmall, RecordBest,
+    __AllIcons= listOf(Back, Bell, Calendar, Delete, Gallery, Kakao, More, PenSmall, RecordBest,
         RecordBookmark, RecordComment, RecordLike, RecordSurprise)
     return __AllIcons!!
   }
