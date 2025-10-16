@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.min.dnapp.presentation.AppStartViewModel
+import com.min.dnapp.presentation.bell.BellScreen
 import com.min.dnapp.presentation.find.FindDetailScreen
 import com.min.dnapp.presentation.find.FindScreen
 import com.min.dnapp.presentation.home.HomeScreen
@@ -45,7 +46,8 @@ class MainActivity : ComponentActivity() {
 //                WriteFinishScreen()
 //                FindScreen()
 //                FindDetailScreen()
-                HomeScreen2()
+//                HomeScreen2()
+                BellScreen()
             }
         }
     }
