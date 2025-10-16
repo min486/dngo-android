@@ -1,6 +1,7 @@
 package com.min.dnapp.presentation.ui.icon
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.min.dnapp.presentation.ui.icon.appicons.ArrowRight
 import com.min.dnapp.presentation.ui.icon.appicons.Back
 import com.min.dnapp.presentation.ui.icon.appicons.Bell
 import com.min.dnapp.presentation.ui.icon.appicons.Calendar
@@ -14,6 +15,7 @@ import com.min.dnapp.presentation.ui.icon.appicons.RecordBookmark
 import com.min.dnapp.presentation.ui.icon.appicons.RecordComment
 import com.min.dnapp.presentation.ui.icon.appicons.RecordLike
 import com.min.dnapp.presentation.ui.icon.appicons.RecordSurprise
+import com.min.dnapp.presentation.ui.icon.appicons.Year
 import kotlin.collections.List as ____KtList
 
 public object AppIcons
@@ -25,7 +27,7 @@ public val AppIcons.AllIcons: ____KtList<ImageVector>
     if (__AllIcons != null) {
       return __AllIcons!!
     }
-    __AllIcons= listOf(Back, Bell, Calendar, Delete, Gallery, Kakao, More, PenSmall, RecordBest,
-        RecordBookmark, RecordComment, RecordLike, RecordSurprise)
+    __AllIcons= listOf(ArrowRight, Back, Bell, Calendar, Delete, Gallery, Kakao, More, PenSmall,
+        RecordBest, RecordBookmark, RecordComment, RecordLike, RecordSurprise, Year)
     return __AllIcons!!
   }

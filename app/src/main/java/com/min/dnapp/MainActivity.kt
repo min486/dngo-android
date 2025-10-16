@@ -18,6 +18,7 @@ import com.min.dnapp.presentation.AppStartViewModel
 import com.min.dnapp.presentation.find.FindDetailScreen
 import com.min.dnapp.presentation.find.FindScreen
 import com.min.dnapp.presentation.home.HomeScreen
+import com.min.dnapp.presentation.home.HomeScreen2
 import com.min.dnapp.presentation.login.LoginScreen
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +44,8 @@ class MainActivity : ComponentActivity() {
 //                RecordWriteScreen()
 //                WriteFinishScreen()
 //                FindScreen()
-                FindDetailScreen()
+//                FindDetailScreen()
+                HomeScreen2()
             }
         }
     }
