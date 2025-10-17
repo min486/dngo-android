@@ -2,7 +2,7 @@
 
 <p>
   <img src="./README.assets/momento.png" alt="momento"/>
-  &nbsp;
+  &nbsp;&nbsp;
   <a href="https://www.google.com/">
     <img src="./README.assets/play.png" width="200" alt="play"/>
   </a>
