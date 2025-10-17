@@ -1,5 +1,6 @@
 package com.min.dnapp.presentation.find.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,9 +18,13 @@ import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @Composable
-fun SharedRecordItem() {
+fun SharedRecordItem(
+    onClick: () -> Unit
+) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .clickable { onClick() }
+            .fillMaxWidth()
     ) {
         // 프로필 이미지
         ProfileImageCircle(modifier = Modifier.size(36.dp))
@@ -62,6 +67,6 @@ fun SharedRecordItem() {
 @Composable
 fun RecordItemPreview() {
     DngoTheme {
-        SharedRecordItem()
+//        SharedRecordItem()
     }
 }

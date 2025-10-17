@@ -1,11 +1,13 @@
 # 모멘토
 
 <p>
-  <img src="./README.assets/momento.png" alt="momento" style="margin-right: 20px;"/>
+  <img src="./README.assets/momento.png" alt="momento"/>
+  &nbsp;
   <a href="https://www.google.com/">
     <img src="./README.assets/play.png" width="200" alt="play"/>
   </a>
 </p>
+
 
 ## 🏝️ 여행을 기록하는 가장 감성적인 방법, 모멘토
 

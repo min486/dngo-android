@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.find.component.SharedRecordItem
 import com.min.dnapp.presentation.ui.icon.AppIcons
@@ -27,7 +28,7 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FindScreen() {
+fun FindScreen(navController: NavHostController) {
     Scaffold(
         containerColor = MomentoTheme.colors.brownBg,
         topBar = {
@@ -74,7 +75,9 @@ fun FindScreen() {
                     modifier = Modifier.padding(20.dp)
                 ) {
                     // 발견 탭에 공유된 여행기록 아이템
-                    SharedRecordItem()
+                    SharedRecordItem(
+                        onClick = { navController.navigate("explore_detail") }
+                    )
                 }
 
                 if (idx < itemCnt - 1) {
@@ -89,6 +92,6 @@ fun FindScreen() {
 @Composable
 fun FindScreenPreview() {
     DngoTheme {
-        FindScreen()
+//        FindScreen()
     }
 }
