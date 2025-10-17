@@ -16,9 +16,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.min.dnapp.presentation.AppStartViewModel
+import com.min.dnapp.presentation.bell.BellScreen
+import com.min.dnapp.presentation.find.FindDetailScreen
 import com.min.dnapp.presentation.find.FindScreen
 import com.min.dnapp.presentation.home.HomeScreen2
-import com.min.dnapp.presentation.login.LoginScreen
+import com.min.dnapp.presentation.login.LoginScreen2
 import com.min.dnapp.presentation.mypage.MypageScreen
 import com.min.dnapp.presentation.ui.component.MomentoBottomNav
 import com.min.dnapp.presentation.ui.theme.DngoTheme
@@ -51,36 +53,50 @@ fun MomentoApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
+    val showBottomBar = when (currentRoute) {
+        "login", "bell", "explore_detail" -> false
+        else -> true
+    }
+
     Scaffold(
         bottomBar = {
-            MomentoBottomNav(
-                currentRoute = currentRoute,
-                onNavItemClick = { route ->
-                    // 현재 경로와 다를때만 navigate 호출
-                    if (navController.currentDestination?.route != route) {
-                        navController.navigate(route)
+            if (showBottomBar) {
+                MomentoBottomNav(
+                    currentRoute = currentRoute,
+                    onNavItemClick = { route ->
+                        // 현재 경로와 다를때만 navigate 호출
+                        if (navController.currentDestination?.route != route) {
+                            navController.navigate(route)
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     ) { paddingValues ->
         NavHost(
             modifier = Modifier.padding(paddingValues),
             navController = navController,
 //            startDestination = startDestination
-            startDestination = "home"
+//            startDestination = "home"
+            startDestination = "login"
         ) {
             composable("login") {
-                LoginScreen(navController = navController)
+                LoginScreen2(navController = navController)
             }
             composable("home") {
-                HomeScreen2()
+                HomeScreen2(navController = navController)
             }
             composable("explore") {
-                FindScreen()
+                FindScreen(navController = navController)
             }
             composable("my") {
                 MypageScreen()
+            }
+            composable("bell") {
+                BellScreen(navController = navController)
+            }
+            composable("explore_detail") {
+                FindDetailScreen(navController = navController)
             }
         }
     }

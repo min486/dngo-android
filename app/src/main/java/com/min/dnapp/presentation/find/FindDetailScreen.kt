@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.find.component.SharedRecordContentSection
 import com.min.dnapp.presentation.find.component.SharedRecordTimeSection
@@ -43,7 +44,7 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FindDetailScreen() {
+fun FindDetailScreen(navController: NavHostController) {
     Scaffold(
         containerColor = MomentoTheme.colors.brownBg,
         topBar = {
@@ -61,7 +62,7 @@ fun FindDetailScreen() {
                 navigationIcon = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.popBackStack() }
                             .padding(16.dp),
                         imageVector = AppIcons.Back,
                         contentDescription = null,
@@ -318,6 +319,6 @@ fun CommentItem() {
 @Composable
 fun FindDetailScreenPreview() {
     DngoTheme {
-        FindDetailScreen()
+//        FindDetailScreen()
     }
 }

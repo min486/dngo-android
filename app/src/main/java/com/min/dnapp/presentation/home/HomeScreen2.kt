@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.mypage.UserBadge
 import com.min.dnapp.presentation.ui.icon.AppIcons
@@ -44,7 +45,7 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen2() {
+fun HomeScreen2(navController: NavHostController) {
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
         topBar = {
@@ -65,7 +66,7 @@ fun HomeScreen2() {
                 actions = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.navigate("bell") }
                             .padding(16.dp),
                         imageVector = AppIcons.Bell,
                         contentDescription = null,
@@ -397,6 +398,6 @@ fun HomeGrayLine(
 @Composable
 fun HomeScreen2Preview() {
     DngoTheme {
-        HomeScreen2()
+//        HomeScreen2()
     }
 }
