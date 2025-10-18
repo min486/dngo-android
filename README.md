@@ -3,10 +3,11 @@
 <p>
   <img src="./README.assets/momento.png" alt="momento"/>
   &nbsp;&nbsp;
-  <a href="https://www.google.com/">
+  <a href="https://play.google.com/store/apps/details?id=com.min.dnapp">
     <img src="./README.assets/play.png" width="200" alt="play"/>
   </a>
 </p>
+
 
 
 ## 🏝️ 여행을 기록하는 가장 감성적인 방법, 모멘토
