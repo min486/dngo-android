@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -27,7 +30,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +54,7 @@ import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 import com.min.dnapp.presentation.write.component.EmotionBottomSheetContent
 import com.min.dnapp.presentation.write.component.WeatherBottomSheetContent
+import com.min.dnapp.util.toLocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,6 +64,10 @@ fun RecordWriteScreen() {
     var isChecked by remember { mutableStateOf(true) }
     var showEmotionBottomSheet by remember { mutableStateOf(false) }
     var showWeatherBottomSheet by remember { mutableStateOf(false) }
+
+    // 캘린더
+    var showDatePicker by remember { mutableStateOf(false) }
+    val dateRangePickerState = rememberDateRangePickerState()
 
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
@@ -108,22 +118,12 @@ fun RecordWriteScreen() {
             ) {
                 Spacer(Modifier.height(20.dp))
 
-                // 날짜
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = AppIcons.Calendar,
-                        contentDescription = null,
-                        tint = MomentoTheme.colors.brownBase
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        text = "2025년 12월 12일 ~ 2025년 12월 13일",
-                        style = MomentoTheme.typography.title02,
-                        color = MomentoTheme.colors.grayW20
-                    )
-                }
+                // 날짜 영역
+                WriteDateSection(
+                    startMillis = dateRangePickerState.selectedStartDateMillis,
+                    endMillis = dateRangePickerState.selectedEndDateMillis,
+                    onClick = { showDatePicker = true }
+                )
 
                 Spacer(Modifier.height(20.dp))
 
@@ -347,6 +347,165 @@ fun RecordWriteScreen() {
             WeatherBottomSheetContent (
                 onConfirm = { showWeatherBottomSheet = false }
             )
+        }
+    }
+
+    // 캘린더(날짜 선택) 모달
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = { showDatePicker = false }
+                ) {
+                    Text(
+                        text = "확인",
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDatePicker = false }
+                ) {
+                    Text(
+                        text = "취소"
+                    )
+                }
+            },
+            colors = DatePickerDefaults.colors(
+                containerColor = MomentoTheme.colors.white
+            )
+        ) {
+            DateRangePicker(
+                state = dateRangePickerState,
+                colors = DatePickerDefaults.colors(
+                    containerColor = MomentoTheme.colors.white,
+                    // 기간(시작일과 종료일 사이 공간)의 배경색
+                    dayInSelectionRangeContainerColor = MomentoTheme.colors.brownW80
+                ),
+                // 펜 아이콘 숨기기 (캘린더 뷰와 텍스트 입력 뷰 전환 역할)
+                showModeToggle = false,
+                title = {
+                    Box(
+                        modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+                    ) {
+                        Text(
+                            text = "여행 날짜 선택",
+                            style = MomentoTheme.typography.title02,
+                            color = MomentoTheme.colors.grayW20
+                        )
+                    }
+                },
+                headline = {
+                    Box(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        CustomDateRangeHeadline(
+                            startDateMillis = dateRangePickerState.selectedStartDateMillis,
+                            endDateMillis = dateRangePickerState.selectedEndDateMillis
+                        )
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun WriteDateSection(
+    startMillis: Long?,
+    endMillis: Long?,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = AppIcons.Calendar,
+            contentDescription = null,
+            tint = MomentoTheme.colors.brownBase
+        )
+        Spacer(Modifier.width(10.dp))
+
+        when {
+            // 날짜 선택되지 않은 경우
+            startMillis == null -> {
+                Text(
+                    text = "날짜 선택",
+                    style = MomentoTheme.typography.title02,
+                    color = MomentoTheme.colors.grayW40
+                )
+            }
+
+            // 시작일만 선택된 경우 or 시작일과 종료일이 같은 날짜에 선택된 경우
+            endMillis == null || startMillis == endMillis -> {
+                val startDate = startMillis.toLocalDate()
+
+                Text(
+                    text = "${startDate?.year}년 ${startDate?.monthValue}월 ${startDate?.dayOfMonth}일",
+                    style = MomentoTheme.typography.title02,
+                    color = MomentoTheme.colors.grayW20
+                )
+            }
+
+            // 시작일과 종료일 모두 선택된 경우 (다른 날짜)
+            else -> {
+                val startDate = startMillis.toLocalDate()
+                val endDate = endMillis.toLocalDate()
+
+                Text(
+                    text = "${startDate?.year}년 ${startDate?.monthValue}월 ${startDate?.dayOfMonth}일 ~ ${endDate?.year}년 ${endDate?.monthValue}월 ${endDate?.dayOfMonth}일",
+                    style = MomentoTheme.typography.title02,
+                    color = MomentoTheme.colors.grayW20
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomDateRangeHeadline(
+    startDateMillis: Long?,
+    endDateMillis: Long?
+) {
+    if (startDateMillis == null) {
+        Text(
+            text = "날짜를 선택해주세요",
+            style = MomentoTheme.typography.body02,
+            color = MomentoTheme.colors.grayW40
+        )
+    } else {
+        val startDate = startDateMillis.toLocalDate()
+
+        if (endDateMillis == null || startDateMillis == endDateMillis) {
+            // 시작일만 선택된 경우 or 시작일과 종료일이 같은 날짜에 선택된 경우
+            Text(
+                text = "${startDate?.year}년 ${startDate?.monthValue}월 ${startDate?.dayOfMonth}일",
+                style = MomentoTheme.typography.body02,
+                color = MomentoTheme.colors.grayW20
+            )
+        } else {
+            // 시작일과 종료일 모두 선택된 경우 (다른 날짜)
+            val endDate = endDateMillis.toLocalDate()
+
+            Row {
+                Text(
+                    text = "${startDate?.year}년 ${startDate?.monthValue}월 ${startDate?.dayOfMonth}일",
+                    style = MomentoTheme.typography.body02,
+                    color = MomentoTheme.colors.grayW20
+                )
+                Text(
+                    text = " ~ ",
+                    style = MomentoTheme.typography.body02,
+                    color = MomentoTheme.colors.grayW20
+                )
+                Text(
+                    text = "${endDate?.year}년 ${endDate?.monthValue}월 ${endDate?.dayOfMonth}일",
+                    style = MomentoTheme.typography.body02,
+                    color = MomentoTheme.colors.grayW20
+                )
+            }
         }
     }
 }
