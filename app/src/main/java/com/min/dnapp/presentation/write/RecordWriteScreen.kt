@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.min.dnapp.R
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Back
@@ -58,7 +59,9 @@ import com.min.dnapp.util.toLocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordWriteScreen() {
+fun RecordWriteScreen(
+    searchViewModel: SearchViewModel = hiltViewModel()
+) {
     val radioOptions = listOf("국내", "해외 (직접 입력)")
     var selectedPlace by remember { mutableStateOf("국내") }
     var isChecked by remember { mutableStateOf(true) }
