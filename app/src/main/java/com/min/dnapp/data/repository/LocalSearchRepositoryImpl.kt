@@ -7,6 +7,8 @@ import com.min.dnapp.data.remote.LocalSearchService
 import com.min.dnapp.domain.model.LocalPlace
 import com.min.dnapp.domain.repository.LocalSearchRepository
 import com.min.dnapp.util.Resource
+import com.min.dnapp.util.extractLastCategory
+import com.min.dnapp.util.removeTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
@@ -18,6 +20,7 @@ class LocalSearchRepositoryImpl @Inject constructor(
     private val api: LocalSearchService
 ) : LocalSearchRepository {
     override fun searchPlaces(query: String): Flow<Resource<List<LocalPlace>>> = flow {
+        // 로딩 상태 방출
         emit(Resource.Loading())
 
         try {
@@ -27,12 +30,13 @@ class LocalSearchRepositoryImpl @Inject constructor(
 
             val places = response.items.map { searchItem ->
                 LocalPlace(
-                    title = searchItem.title,
-                    category = searchItem.category,
+                    title = searchItem.title.removeTag(),
+                    category = searchItem.category.extractLastCategory(),
                     roadAddress = searchItem.roadAddress
                 )
             }
 
+            // 성공 상태 방출
             emit(Resource.Success(places))
         } catch (e: HttpException) {
             emit(Resource.Error("서버 오류 발생"))
