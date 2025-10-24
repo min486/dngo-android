@@ -1,5 +1,6 @@
 package com.min.dnapp.presentation.write
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDateRangePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +48,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.min.dnapp.R
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Back
@@ -54,6 +57,7 @@ import com.min.dnapp.presentation.ui.icon.appicons.Gallery
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 import com.min.dnapp.presentation.write.component.EmotionBottomSheetContent
+import com.min.dnapp.presentation.write.component.PlaceBottomSheetContent
 import com.min.dnapp.presentation.write.component.WeatherBottomSheetContent
 import com.min.dnapp.util.toLocalDate
 
@@ -62,6 +66,8 @@ import com.min.dnapp.util.toLocalDate
 fun RecordWriteScreen(
     searchViewModel: SearchViewModel = hiltViewModel()
 ) {
+    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
+
     val radioOptions = listOf("국내", "해외 (직접 입력)")
     var selectedPlace by remember { mutableStateOf("국내") }
     var isChecked by remember { mutableStateOf(true) }
@@ -71,6 +77,13 @@ fun RecordWriteScreen(
     // 캘린더
     var showDatePicker by remember { mutableStateOf(false) }
     val dateRangePickerState = rememberDateRangePickerState()
+
+    // 여행지 - 위치 추가
+    var showPlaceBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(
+        // halfExpanded 상태 건너뛰기
+        skipPartiallyExpanded = true
+    )
 
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
@@ -239,6 +252,7 @@ fun RecordWriteScreen(
                     Spacer(Modifier.height(12.dp))
 
                     Row(
+                        modifier = Modifier.clickable { showPlaceBottomSheet = true },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
@@ -409,6 +423,29 @@ fun RecordWriteScreen(
                         )
                     }
                 }
+            )
+        }
+    }
+
+    // 위치 추가 바텀시트
+    if (showPlaceBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showPlaceBottomSheet = false },
+            sheetState = sheetState,
+            dragHandle = null,
+            containerColor = MomentoTheme.colors.white,
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        ) {
+            PlaceBottomSheetContent (
+                value = searchState.query,
+                places = searchState.places,
+                onValueChange = { newValue ->
+                    Log.e("naver", "newValue : $newValue")
+                    searchViewModel.updateQuery(newValue)
+                },
+                onSearch = { searchViewModel.searchPlace() },
+                onConfirm = { showPlaceBottomSheet = false },
+                onClear = { searchViewModel.clearSearchResult() }
             )
         }
     }

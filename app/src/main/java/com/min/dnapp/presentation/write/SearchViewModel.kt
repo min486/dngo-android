@@ -1,14 +1,15 @@
 package com.min.dnapp.presentation.write
 
 import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.min.dnapp.domain.usecase.LocalSearchUseCase
 import com.min.dnapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -18,34 +19,55 @@ class SearchViewModel @Inject constructor(
     private val localSearchUseCase: LocalSearchUseCase
 ) : ViewModel() {
 
-    private val _searchState = mutableStateOf(SearchState())
-    val searchState: State<SearchState> = _searchState
+    private val _searchState = MutableStateFlow(SearchState())
+    val searchState: StateFlow<SearchState> = _searchState.asStateFlow()
 
     // 이전 검색 작업을 취소하기 위한 Job
     private var searchJob: Job? = null
 
-    init {
-        searchPlace("광안리해수욕장")
+//    init {
+//        searchPlace("광안리해수욕장")
+//    }
+
+    /**
+     * textField의 입력 값만 업데이트하고, 검색 API 호출은 생략
+     */
+    fun updateQuery(newQuery: String) {
+        _searchState.value = _searchState.value.copy(query = newQuery)
+
+        // 검색어가 빈 경우 목록 지우기
+        if (newQuery.isBlank()) {
+            // 진행중인 검색 작업 취소
+            searchJob?.cancel()
+            Log.d("naver", "updateQuery - newQuery blank")
+        }
     }
 
-    fun searchPlace(query: String) {
+    /**
+     * 검색 결과 목록 초기화
+     * (textField에 포커스가 잡히거나, 새 검색 시작할 때 사용)
+     */
+    fun clearSearchResult() {
+        searchJob?.cancel()
+
+        // query는 그대로 유지, 결과 목록만 초기화
+        _searchState.value = _searchState.value.copy(
+            isLoading = false,
+            places = emptyList(),
+            error = null
+        )
+        Log.d("naver", "result cleared")
+    }
+
+    /**
+     * 검색 버튼 클릭 시, 검색 API 호출
+     */
+    fun searchPlace() {
         val currentQuery = _searchState.value.query
 
-        // 검색어 상태 업데이트 (textField 값과 viewModel 상태를 동기화)
-        _searchState.value = _searchState.value.copy(query = query)
-
-        // 검색어가 이전과 같으면 API 호출 막음
-        if (query == currentQuery) return
-
-        // 검색어가 비어있을 경우 (사용자가 모두 지웠을 경우)
-        if (query.isBlank()) {
-            searchJob?.cancel()
-            _searchState.value = _searchState.value.copy(
-                isLoading = false,
-                places = emptyList(),
-                error = null
-            )
-            Log.d("naver", "search query blank")
+        // 검색어가 빈 경우
+        if (currentQuery.isBlank()) {
+            Log.d("naver", "searchPlace - newQuery blank")
             return
         }
 
@@ -53,7 +75,7 @@ class SearchViewModel @Inject constructor(
         searchJob?.cancel()
 
         // Flow 수집 및 상태 업데이트 시작
-        searchJob = localSearchUseCase(query)
+        searchJob = localSearchUseCase(currentQuery)
             .onEach { result ->
                 when (result) {
                     is Resource.Loading -> {
@@ -63,8 +85,7 @@ class SearchViewModel @Inject constructor(
                             places = result.data ?: emptyList(),
                             error = null
                         )
-                        Log.d("naver", "search for $query : Loading...")
-
+                        Log.d("naver", "search for $currentQuery : Loading...")
                     }
                     is Resource.Success -> {
                         // 성공
