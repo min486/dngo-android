@@ -29,6 +29,12 @@ class SearchViewModel @Inject constructor(
     private val _overseasPlace = MutableStateFlow("")
     val overseasPlace: StateFlow<String> = _overseasPlace.asStateFlow()
 
+    private val _recordTitle = MutableStateFlow("")
+    val recordTitle: StateFlow<String> = _recordTitle.asStateFlow()
+
+    private val _recordContent = MutableStateFlow("")
+    val recordContent: StateFlow<String> = _recordContent.asStateFlow()
+
     // 이전 검색 작업을 취소하기 위한 Job
     private var searchJob: Job? = null
 
@@ -128,8 +134,24 @@ class SearchViewModel @Inject constructor(
     /**
      * 해외 - textField의 입력 값 업데이트
      */
-    fun updateOverseas(newPlace: String) {
-        _overseasPlace.value = newPlace
-        Log.d("write", "updateOverseas - newPlace : $newPlace")
+    fun updateOverseas(newText: String) {
+        _overseasPlace.value = newText
+        Log.d("write", "updateOverseas - newText : $newText")
+    }
+
+    /**
+     * 제목 - textField의 입력 값 업데이트
+     */
+    fun updateTitle(newText: String) {
+        _recordTitle.value = newText
+        Log.d("write", "updateTitle - newText : $newText")
+    }
+
+    /**
+     * 내용 - textField의 입력 값 업데이트
+     */
+    fun updateContent(newText: String) {
+        _recordContent.value = newText
+        Log.d("write", "updateContent - newText : $newText")
     }
 }

@@ -71,6 +71,8 @@ fun RecordWriteScreen(
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
     val selectedPlace by searchViewModel.selectedPlace.collectAsStateWithLifecycle()
     val overseasPlace by searchViewModel.overseasPlace.collectAsStateWithLifecycle()
+    val recordTitle by searchViewModel.recordTitle.collectAsStateWithLifecycle()
+    val recordContent by searchViewModel.recordContent.collectAsStateWithLifecycle()
 
     var isChecked by remember { mutableStateOf(true) }
     var showEmotionBottomSheet by remember { mutableStateOf(false) }
@@ -198,12 +200,12 @@ fun RecordWriteScreen(
 
                 Spacer(Modifier.height(20.dp))
 
-                // 제목
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .background(color = MomentoTheme.colors.brownBg, shape = RoundedCornerShape(5.dp))
+                // 제목 영역
+                RecordTitleSection(
+                    recordTitle = recordTitle,
+                    onValueChange = { newValue ->
+                        searchViewModel.updateTitle(newValue)
+                    }
                 )
 
                 Spacer(Modifier.height(20.dp))
@@ -220,23 +222,13 @@ fun RecordWriteScreen(
 
                 Spacer(Modifier.height(40.dp))
 
-                // 내용
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "이번 여행에 대해 소개해주세요.",
-                        style = MomentoTheme.typography.body01,
-                        color = MomentoTheme.colors.grayW20
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(310.dp)
-                            .background(color = MomentoTheme.colors.brownBg)
-                    )
-                }
+                // 내용 영역
+                RecordContentSection(
+                    recordContent = recordContent,
+                    onValueChange = { newValue ->
+                        searchViewModel.updateContent(newValue)
+                    }
+                )
             }
 
             Row(
@@ -606,6 +598,75 @@ fun PlaceSelectSection(
                     singleLine = true
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun RecordTitleSection(
+    recordTitle: String,
+    onValueChange: (String) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .background(color = MomentoTheme.colors.brownBg, shape = RoundedCornerShape(5.dp))
+            .padding(start = 12.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        if (recordTitle.isEmpty()) {
+            Text(
+                text = "제목",
+                style = MomentoTheme.typography.body02,
+                color = MomentoTheme.colors.grayW60
+            )
+        }
+        BasicTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = recordTitle,
+            onValueChange = onValueChange,
+            textStyle = MomentoTheme.typography.body02,
+            singleLine = true
+        )
+    }
+}
+
+@Composable
+fun RecordContentSection(
+    recordContent: String,
+    onValueChange: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "이번 여행에 대해 소개해주세요.",
+            style = MomentoTheme.typography.body01,
+            color = MomentoTheme.colors.grayW20
+        )
+        Spacer(Modifier.height(12.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(310.dp)
+                .background(color = MomentoTheme.colors.brownBg, shape = RoundedCornerShape(5.dp))
+                .padding(12.dp)
+        ) {
+            if (recordContent.isEmpty()) {
+                Text(
+                    text = "내용",
+                    style = MomentoTheme.typography.body02,
+                    color = MomentoTheme.colors.grayW60
+                )
+            }
+            BasicTextField(
+                modifier = Modifier.fillMaxSize(),
+                value = recordContent,
+                onValueChange = onValueChange,
+                textStyle = MomentoTheme.typography.body02,
+                singleLine = false
+            )
         }
     }
 }
