@@ -51,7 +51,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.min.dnapp.R
+import com.min.dnapp.domain.model.EmotionType
 import com.min.dnapp.domain.model.LocalPlace
+import com.min.dnapp.domain.model.WeatherType
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Back
 import com.min.dnapp.presentation.ui.icon.appicons.Calendar
@@ -73,6 +75,8 @@ fun RecordWriteScreen(
     val overseasPlace by searchViewModel.overseasPlace.collectAsStateWithLifecycle()
     val recordTitle by searchViewModel.recordTitle.collectAsStateWithLifecycle()
     val recordContent by searchViewModel.recordContent.collectAsStateWithLifecycle()
+    val selectedEmotion by searchViewModel.selectedEmotion.collectAsStateWithLifecycle()
+    val selectedWeather by searchViewModel.selectedWeather.collectAsStateWithLifecycle()
 
     var isChecked by remember { mutableStateOf(true) }
     var showEmotionBottomSheet by remember { mutableStateOf(false) }
@@ -147,56 +151,13 @@ fun RecordWriteScreen(
 
                 Spacer(Modifier.height(20.dp))
 
-                // 감정 & 날씨
-                Row {
-                    Row(
-                        modifier = Modifier.clickable { showEmotionBottomSheet = true },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "감정 태그",
-                            style = MomentoTheme.typography.body01,
-                            color = MomentoTheme.colors.grayW20
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .background(color = MomentoTheme.colors.white, shape = RoundedCornerShape(5.dp))
-                                .border(width = 1.dp, color = MomentoTheme.colors.pinkW60, shape = RoundedCornerShape(5.dp))
-                                .padding(6.dp)
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.emotion_love),
-                                contentDescription = null
-                            )
-                        }
-                    }
-                    Spacer(Modifier.width(20.dp))
-                    Row(
-                        modifier = Modifier.clickable { showWeatherBottomSheet = true },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "날씨",
-                            style = MomentoTheme.typography.body01,
-                            color = MomentoTheme.colors.grayW20
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .background(color = MomentoTheme.colors.white, shape = RoundedCornerShape(5.dp))
-                                .border(width = 1.dp, color = MomentoTheme.colors.pinkW60, shape = RoundedCornerShape(5.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.weather_cloud),
-                                contentDescription = null
-                            )
-                        }
-                    }
-                }
+                // 감정 & 날씨 영역
+                EmotionAndWeatherSection(
+                    selectedEmotion = selectedEmotion,
+                    selectedWeather = selectedWeather,
+                    onClickEmotion = { showEmotionBottomSheet = true },
+                    onClickWeather = { showWeatherBottomSheet = true }
+                )
 
                 Spacer(Modifier.height(20.dp))
 
@@ -290,7 +251,10 @@ fun RecordWriteScreen(
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
             EmotionBottomSheetContent(
-                onConfirm = { showEmotionBottomSheet = false }
+                onConfirm = { emotionType ->
+                    searchViewModel.selectEmotion(emotionType)
+                    showEmotionBottomSheet = false
+                }
             )
         }
     }
@@ -304,7 +268,10 @@ fun RecordWriteScreen(
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
             WeatherBottomSheetContent (
-                onConfirm = { showWeatherBottomSheet = false }
+                onConfirm = { weatherType ->
+                    searchViewModel.selectWeather(weatherType)
+                    showWeatherBottomSheet = false
+                }
             )
         }
     }
@@ -490,6 +457,68 @@ fun CustomDateRangeHeadline(
                     style = MomentoTheme.typography.body02,
                     color = MomentoTheme.colors.grayW20
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun EmotionAndWeatherSection(
+    selectedEmotion: EmotionType?,
+    selectedWeather: WeatherType?,
+    onClickEmotion: () -> Unit,
+    onClickWeather: () -> Unit
+) {
+    Row {
+        Row(
+            modifier = Modifier.clickable { onClickEmotion() },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "감정 태그",
+                style = MomentoTheme.typography.body01,
+                color = MomentoTheme.colors.grayW20
+            )
+            Spacer(Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(color = MomentoTheme.colors.white, shape = RoundedCornerShape(5.dp))
+                    .border(width = 1.dp, color = MomentoTheme.colors.pinkW60, shape = RoundedCornerShape(5.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                selectedEmotion?.let { emotionType ->
+                    Image(
+                        painter = painterResource(emotionType.resId),
+                        contentDescription = null
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.width(20.dp))
+        Row(
+            modifier = Modifier.clickable { onClickWeather() },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "날씨",
+                style = MomentoTheme.typography.body01,
+                color = MomentoTheme.colors.grayW20
+            )
+            Spacer(Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(color = MomentoTheme.colors.white, shape = RoundedCornerShape(5.dp))
+                    .border(width = 1.dp, color = MomentoTheme.colors.pinkW60, shape = RoundedCornerShape(5.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                selectedWeather?.let { weatherType ->
+                    Image(
+                        painter = painterResource(weatherType.resId),
+                        contentDescription = null
+                    )
+                }
             }
         }
     }

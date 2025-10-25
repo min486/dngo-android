@@ -3,7 +3,9 @@ package com.min.dnapp.presentation.write
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.min.dnapp.domain.model.EmotionType
 import com.min.dnapp.domain.model.LocalPlace
+import com.min.dnapp.domain.model.WeatherType
 import com.min.dnapp.domain.usecase.LocalSearchUseCase
 import com.min.dnapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +36,12 @@ class SearchViewModel @Inject constructor(
 
     private val _recordContent = MutableStateFlow("")
     val recordContent: StateFlow<String> = _recordContent.asStateFlow()
+
+    private val _selectedEmotion = MutableStateFlow<EmotionType?>(null)
+    val selectedEmotion: StateFlow<EmotionType?> = _selectedEmotion.asStateFlow()
+
+    private val _selectedWeather = MutableStateFlow<WeatherType?>(null)
+    val selectedWeather: StateFlow<WeatherType?> = _selectedWeather.asStateFlow()
 
     // 이전 검색 작업을 취소하기 위한 Job
     private var searchJob: Job? = null
@@ -153,5 +161,21 @@ class SearchViewModel @Inject constructor(
     fun updateContent(newText: String) {
         _recordContent.value = newText
         Log.d("write", "updateContent - newText : $newText")
+    }
+
+    /**
+     * 선택된 감정 저장
+     */
+    fun selectEmotion(emotionType: EmotionType) {
+        _selectedEmotion.value = emotionType
+        Log.d("write", "selectEmotion - emotionType : $emotionType")
+    }
+
+    /**
+     * 선택된 날씨 저장
+     */
+    fun selectWeather(weatherType: WeatherType) {
+        _selectedWeather.value = weatherType
+        Log.d("write", "selectWeather - weatherType : $weatherType")
     }
 }
