@@ -77,14 +77,14 @@ fun RecordWriteScreen(
     val recordContent by searchViewModel.recordContent.collectAsStateWithLifecycle()
     val selectedEmotion by searchViewModel.selectedEmotion.collectAsStateWithLifecycle()
     val selectedWeather by searchViewModel.selectedWeather.collectAsStateWithLifecycle()
-
-    var isChecked by remember { mutableStateOf(true) }
-    var showEmotionBottomSheet by remember { mutableStateOf(false) }
-    var showWeatherBottomSheet by remember { mutableStateOf(false) }
+    val isChecked by searchViewModel.isChecked.collectAsStateWithLifecycle()
 
     // 캘린더
     var showDatePicker by remember { mutableStateOf(false) }
     val dateRangePickerState = rememberDateRangePickerState()
+
+    var showEmotionBottomSheet by remember { mutableStateOf(false) }
+    var showWeatherBottomSheet by remember { mutableStateOf(false) }
 
     // 여행지 - 위치 추가
     var showPlaceBottomSheet by remember { mutableStateOf(false) }
@@ -162,7 +162,7 @@ fun RecordWriteScreen(
                 Spacer(Modifier.height(20.dp))
 
                 // 제목 영역
-                RecordTitleSection(
+                WriteTitleSection(
                     recordTitle = recordTitle,
                     onValueChange = { newValue ->
                         searchViewModel.updateTitle(newValue)
@@ -171,8 +171,8 @@ fun RecordWriteScreen(
 
                 Spacer(Modifier.height(20.dp))
 
-                // 여행지 선택 영역
-                PlaceSelectSection(
+                // 여행지 영역
+                WritePlaceSection(
                     selectedPlace = selectedPlace,
                     overseasPlace = overseasPlace,
                     onValueChange = { newValue ->
@@ -184,7 +184,7 @@ fun RecordWriteScreen(
                 Spacer(Modifier.height(40.dp))
 
                 // 내용 영역
-                RecordContentSection(
+                WriteContentSection(
                     recordContent = recordContent,
                     onValueChange = { newValue ->
                         searchViewModel.updateContent(newValue)
@@ -192,85 +192,11 @@ fun RecordWriteScreen(
                 )
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = MomentoTheme.colors.white),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier
-                        .clickable {  }
-                        .padding(20.dp),
-                    imageVector = AppIcons.Gallery,
-                    contentDescription = null,
-                    tint = MomentoTheme.colors.grayW60
-                )
-
-                Row(
-                    modifier = Modifier.padding(end = 20.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "공유 여부",
-                        style = MomentoTheme.typography.body01,
-                        color = MomentoTheme.colors.grayW20
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Switch(
-                        // 기본 크기의 80%로 축소
-                        modifier = Modifier.scale(0.8f),
-                        checked = isChecked,
-                        onCheckedChange = { newChecked ->
-                            isChecked = newChecked
-                        },
-                        thumbContent = { FixedSizeThumbBox() },
-                        colors = SwitchDefaults.colors(
-                            // on - switch 배경 색
-                            checkedTrackColor = MomentoTheme.colors.greenW20,
-                            // off - switch 배경 색
-                            uncheckedTrackColor = MomentoTheme.colors.grayW80,
-                            // off - switch 테두리 색
-                            uncheckedBorderColor = Color.Transparent,
-                            // off - thumb 테두리 색
-                            uncheckedThumbColor = MomentoTheme.colors.white
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    // 감정 선택 바텀시트
-    if (showEmotionBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showEmotionBottomSheet = false },
-            dragHandle = null,
-            containerColor = MomentoTheme.colors.white,
-            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-        ) {
-            EmotionBottomSheetContent(
-                onConfirm = { emotionType ->
-                    searchViewModel.selectEmotion(emotionType)
-                    showEmotionBottomSheet = false
-                }
-            )
-        }
-    }
-
-    // 날씨 선택 바텀시트
-    if (showWeatherBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showWeatherBottomSheet = false },
-            dragHandle = null,
-            containerColor = MomentoTheme.colors.white,
-            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-        ) {
-            WeatherBottomSheetContent (
-                onConfirm = { weatherType ->
-                    searchViewModel.selectWeather(weatherType)
-                    showWeatherBottomSheet = false
+            // 이미지 아이콘 & 공유여부 스위치 영역
+            ImageAndShareSection(
+                isChecked = isChecked,
+                onCheckedChange = { newChecked ->
+                    searchViewModel.updateShare(newChecked)
                 }
             )
         }
@@ -331,6 +257,40 @@ fun RecordWriteScreen(
                             endDateMillis = dateRangePickerState.selectedEndDateMillis
                         )
                     }
+                }
+            )
+        }
+    }
+
+    // 감정 선택 바텀시트
+    if (showEmotionBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showEmotionBottomSheet = false },
+            dragHandle = null,
+            containerColor = MomentoTheme.colors.white,
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        ) {
+            EmotionBottomSheetContent(
+                onConfirm = { emotionType ->
+                    searchViewModel.selectEmotion(emotionType)
+                    showEmotionBottomSheet = false
+                }
+            )
+        }
+    }
+
+    // 날씨 선택 바텀시트
+    if (showWeatherBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showWeatherBottomSheet = false },
+            dragHandle = null,
+            containerColor = MomentoTheme.colors.white,
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        ) {
+            WeatherBottomSheetContent (
+                onConfirm = { weatherType ->
+                    searchViewModel.selectWeather(weatherType)
+                    showWeatherBottomSheet = false
                 }
             )
         }
@@ -525,7 +485,7 @@ fun EmotionAndWeatherSection(
 }
 
 @Composable
-fun PlaceSelectSection(
+fun WritePlaceSection(
     selectedPlace: LocalPlace?,
     overseasPlace: String,
     onValueChange: (String) -> Unit,
@@ -632,7 +592,7 @@ fun PlaceSelectSection(
 }
 
 @Composable
-fun RecordTitleSection(
+fun WriteTitleSection(
     recordTitle: String,
     onValueChange: (String) -> Unit
 ) {
@@ -662,7 +622,7 @@ fun RecordTitleSection(
 }
 
 @Composable
-fun RecordContentSection(
+fun WriteContentSection(
     recordContent: String,
     onValueChange: (String) -> Unit
 ) {
@@ -695,6 +655,58 @@ fun RecordContentSection(
                 onValueChange = onValueChange,
                 textStyle = MomentoTheme.typography.body02,
                 singleLine = false
+            )
+        }
+    }
+}
+
+@Composable
+fun ImageAndShareSection(
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = MomentoTheme.colors.white),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            modifier = Modifier
+                .clickable {  }
+                .padding(20.dp),
+            imageVector = AppIcons.Gallery,
+            contentDescription = null,
+            tint = MomentoTheme.colors.grayW60
+        )
+
+        Row(
+            modifier = Modifier.padding(end = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "공유 여부",
+                style = MomentoTheme.typography.body01,
+                color = MomentoTheme.colors.grayW20
+            )
+            Spacer(Modifier.width(8.dp))
+            Switch(
+                // 기본 크기의 80%로 축소
+                modifier = Modifier.scale(0.8f),
+                checked = isChecked,
+                onCheckedChange = onCheckedChange,
+                thumbContent = { FixedSizeThumbBox() },
+                colors = SwitchDefaults.colors(
+                    // on - switch 배경 색
+                    checkedTrackColor = MomentoTheme.colors.greenW20,
+                    // off - switch 배경 색
+                    uncheckedTrackColor = MomentoTheme.colors.grayW80,
+                    // off - switch 테두리 색
+                    uncheckedBorderColor = Color.Transparent,
+                    // off - thumb 테두리 색
+                    uncheckedThumbColor = MomentoTheme.colors.white
+                )
             )
         }
     }

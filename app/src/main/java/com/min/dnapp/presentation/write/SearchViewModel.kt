@@ -43,6 +43,9 @@ class SearchViewModel @Inject constructor(
     private val _selectedWeather = MutableStateFlow<WeatherType?>(null)
     val selectedWeather: StateFlow<WeatherType?> = _selectedWeather.asStateFlow()
 
+    private val _isChecked = MutableStateFlow(true)
+    val isChecked: StateFlow<Boolean> = _isChecked.asStateFlow()
+
     // 이전 검색 작업을 취소하기 위한 Job
     private var searchJob: Job? = null
 
@@ -177,5 +180,13 @@ class SearchViewModel @Inject constructor(
     fun selectWeather(weatherType: WeatherType) {
         _selectedWeather.value = weatherType
         Log.d("write", "selectWeather - weatherType : $weatherType")
+    }
+
+    /**
+     * 공유여부 설정 상태 업데이트
+     */
+    fun updateShare(newChecked: Boolean) {
+        _isChecked.value = newChecked
+        Log.d("write", "updateShare - newChecked : $newChecked")
     }
 }
