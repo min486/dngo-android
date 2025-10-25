@@ -1,6 +1,8 @@
 package com.min.dnapp.presentation.write.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,9 +18,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -35,9 +42,13 @@ fun PlaceBottomSheetContent(
     places: List<LocalPlace>,
     onValueChange: (String) -> Unit,
     onSearch: () -> Unit,
-    onConfirm: () -> Unit,
-    onClear: () -> Unit
+    onClear: () -> Unit,
+    onConfirm: (LocalPlace) -> Unit,
 ) {
+    // 검색 결과 목록에서 선택된 아이템
+    var selectedPlace by remember { mutableStateOf<LocalPlace?>(null) }
+
+    // UI 컨트롤러
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
@@ -52,7 +63,6 @@ fun PlaceBottomSheetContent(
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-//            .padding(horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(20.dp))
@@ -76,6 +86,7 @@ fun PlaceBottomSheetContent(
                     .fillMaxWidth()
                     .onFocusChanged { focusState ->
                         if (focusState.isFocused) {
+                            selectedPlace = null
                             onClear()
                         }
                     },
@@ -90,6 +101,8 @@ fun PlaceBottomSheetContent(
             )
         }
 
+        Spacer(Modifier.height(20.dp))
+
         // 검색 결과 목록
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -98,7 +111,9 @@ fun PlaceBottomSheetContent(
                 PlaceItem(
                     placeName = item.title,
                     placeCategory = item.category,
-                    placeRoadAddress = item.roadAddress
+                    placeRoadAddress = item.roadAddress,
+                    isSelected = selectedPlace == item,
+                    onClick = { selectedPlace = item }
                 )
             }
         }
@@ -111,8 +126,11 @@ fun PlaceBottomSheetContent(
                 .padding(horizontal = 20.dp)
         ) {
             SelectButton(
-                enabled = false,
-                onConfirm = {}
+                enabled = selectedPlace != null,
+                onConfirm = {
+                    // 콜백으로 이벤트 전달
+                    selectedPlace?.let(onConfirm)
+                }
             )
             Spacer(Modifier.height(16.dp))
         }
@@ -123,11 +141,17 @@ fun PlaceBottomSheetContent(
 fun PlaceItem(
     placeName: String,
     placeCategory: String,
-    placeRoadAddress: String
+    placeRoadAddress: String,
+    isSelected: Boolean = false,
+    onClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
+            .clickable { onClick() }
             .fillMaxWidth()
+            .background(
+                if (isSelected) MomentoTheme.colors.brownW80 else Color.Transparent
+            )
             .padding(20.dp),
     ) {
         Row(

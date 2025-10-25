@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.min.dnapp.R
+import com.min.dnapp.domain.model.LocalPlace
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Back
 import com.min.dnapp.presentation.ui.icon.appicons.Calendar
@@ -67,9 +69,9 @@ fun RecordWriteScreen(
     searchViewModel: SearchViewModel = hiltViewModel()
 ) {
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
+    val selectedPlace by searchViewModel.selectedPlace.collectAsStateWithLifecycle()
+    val overseasPlace by searchViewModel.overseasPlace.collectAsStateWithLifecycle()
 
-    val radioOptions = listOf("국내", "해외 (직접 입력)")
-    var selectedPlace by remember { mutableStateOf("국내") }
     var isChecked by remember { mutableStateOf(true) }
     var showEmotionBottomSheet by remember { mutableStateOf(false) }
     var showWeatherBottomSheet by remember { mutableStateOf(false) }
@@ -206,67 +208,15 @@ fun RecordWriteScreen(
 
                 Spacer(Modifier.height(20.dp))
 
-                // 여행지
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "어디로 다녀오셨나요?",
-                            style = MomentoTheme.typography.body01,
-                            color = MomentoTheme.colors.grayW20
-                        )
-
-                        // 라디오 버튼
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            radioOptions.forEachIndexed { idx, text ->
-                                RadioButton(
-                                    modifier = Modifier.size(24.dp),
-                                    selected = (text == selectedPlace),
-                                    onClick = { selectedPlace = text },
-                                    colors = RadioButtonDefaults.colors(
-                                        selectedColor = MomentoTheme.colors.greenW20,
-                                        unselectedColor = MomentoTheme.colors.grayW80,
-                                        disabledSelectedColor = MomentoTheme.colors.white
-                                    )
-                                )
-                                Spacer(Modifier.width(4.dp))
-                                Text(
-                                    text = text,
-                                    style = MomentoTheme.typography.body03,
-                                    color = MomentoTheme.colors.grayW20
-                                )
-                                if (idx == 0) {
-                                    Spacer(Modifier.width(12.dp))
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(Modifier.height(12.dp))
-
-                    Row(
-                        modifier = Modifier.clickable { showPlaceBottomSheet = true },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.write_place),
-                            contentDescription = null
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            text = "위치 추가",
-                            style = MomentoTheme.typography.body02,
-                            color = MomentoTheme.colors.grayW40
-                        )
-                    }
-                }
+                // 여행지 선택 영역
+                PlaceSelectSection(
+                    selectedPlace = selectedPlace,
+                    overseasPlace = overseasPlace,
+                    onValueChange = { newValue ->
+                        searchViewModel.updateOverseas(newValue)
+                    },
+                    onClick = { showPlaceBottomSheet = true }
+                )
 
                 Spacer(Modifier.height(40.dp))
 
@@ -436,7 +386,7 @@ fun RecordWriteScreen(
             containerColor = MomentoTheme.colors.white,
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
-            PlaceBottomSheetContent (
+            PlaceBottomSheetContent(
                 value = searchState.query,
                 places = searchState.places,
                 onValueChange = { newValue ->
@@ -444,8 +394,11 @@ fun RecordWriteScreen(
                     searchViewModel.updateQuery(newValue)
                 },
                 onSearch = { searchViewModel.searchPlace() },
-                onConfirm = { showPlaceBottomSheet = false },
-                onClear = { searchViewModel.clearSearchResult() }
+                onClear = { searchViewModel.clearSearchResult() },
+                onConfirm = { place ->
+                    searchViewModel.selectPlace(place)
+                    showPlaceBottomSheet = false
+                },
             )
         }
     }
@@ -544,6 +497,113 @@ fun CustomDateRangeHeadline(
                     text = "${endDate?.year}년 ${endDate?.monthValue}월 ${endDate?.dayOfMonth}일",
                     style = MomentoTheme.typography.body02,
                     color = MomentoTheme.colors.grayW20
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PlaceSelectSection(
+    selectedPlace: LocalPlace?,
+    overseasPlace: String,
+    onValueChange: (String) -> Unit,
+    onClick: () -> Unit,
+) {
+    val radioOptions = listOf("국내", "해외 (직접 입력)")
+    var selectedCountry by remember { mutableStateOf("국내") }
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "어디로 다녀오셨나요?",
+                style = MomentoTheme.typography.body01,
+                color = MomentoTheme.colors.grayW20
+            )
+
+            // 라디오 버튼
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                radioOptions.forEachIndexed { idx, text ->
+                    RadioButton(
+                        modifier = Modifier.size(24.dp),
+                        selected = (text == selectedCountry),
+                        onClick = { selectedCountry = text },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = MomentoTheme.colors.greenW20,
+                            unselectedColor = MomentoTheme.colors.grayW80,
+                            disabledSelectedColor = MomentoTheme.colors.white
+                        )
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        text = text,
+                        style = MomentoTheme.typography.body03,
+                        color = MomentoTheme.colors.grayW20
+                    )
+                    if (idx == 0) {
+                        Spacer(Modifier.width(12.dp))
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        if (selectedCountry == "국내") {
+            Row(
+                modifier = Modifier.clickable { onClick() },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.write_place),
+                    contentDescription = null
+                )
+                Spacer(Modifier.width(6.dp))
+                if (selectedPlace == null) {
+                    Text(
+                        text = "위치 추가",
+                        style = MomentoTheme.typography.body02,
+                        color = MomentoTheme.colors.grayW40
+                    )
+                } else {
+                    Text(
+                        text = selectedPlace.title,
+                        style = MomentoTheme.typography.body02,
+                        color = MomentoTheme.colors.grayW20
+                    )
+                }
+            }
+        } else {
+            // 해외
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .background(color = MomentoTheme.colors.brownBg, shape = RoundedCornerShape(5.dp))
+                    .padding(start = 12.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                if (overseasPlace.isEmpty()) {
+                    Text(
+                        text = "예) 도쿄, 발리",
+                        style = MomentoTheme.typography.body02,
+                        color = MomentoTheme.colors.grayW60
+                    )
+                }
+                BasicTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = overseasPlace,
+                    onValueChange = onValueChange,
+                    textStyle = MomentoTheme.typography.body02,
+                    singleLine = true
                 )
             }
         }

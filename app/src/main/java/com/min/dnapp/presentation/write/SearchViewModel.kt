@@ -3,6 +3,7 @@ package com.min.dnapp.presentation.write
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.min.dnapp.domain.model.LocalPlace
 import com.min.dnapp.domain.usecase.LocalSearchUseCase
 import com.min.dnapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,12 @@ class SearchViewModel @Inject constructor(
 
     private val _searchState = MutableStateFlow(SearchState())
     val searchState: StateFlow<SearchState> = _searchState.asStateFlow()
+
+    private val _selectedPlace = MutableStateFlow<LocalPlace?>(null)
+    val selectedPlace: StateFlow<LocalPlace?> = _selectedPlace.asStateFlow()
+
+    private val _overseasPlace = MutableStateFlow("")
+    val overseasPlace: StateFlow<String> = _overseasPlace.asStateFlow()
 
     // 이전 검색 작업을 취소하기 위한 Job
     private var searchJob: Job? = null
@@ -41,22 +48,6 @@ class SearchViewModel @Inject constructor(
             searchJob?.cancel()
             Log.d("naver", "updateQuery - newQuery blank")
         }
-    }
-
-    /**
-     * 검색 결과 목록 초기화
-     * (textField에 포커스가 잡히거나, 새 검색 시작할 때 사용)
-     */
-    fun clearSearchResult() {
-        searchJob?.cancel()
-
-        // query는 그대로 유지, 결과 목록만 초기화
-        _searchState.value = _searchState.value.copy(
-            isLoading = false,
-            places = emptyList(),
-            error = null
-        )
-        Log.d("naver", "result cleared")
     }
 
     /**
@@ -109,5 +100,36 @@ class SearchViewModel @Inject constructor(
             }
             // viewModelScope에서 flow를 실행
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * 검색 결과 목록 초기화
+     * (textField에 포커스가 잡히거나, 새 검색 시작할 때 사용)
+     */
+    fun clearSearchResult() {
+        searchJob?.cancel()
+
+        // query는 그대로 유지, 결과 목록만 초기화
+        _searchState.value = _searchState.value.copy(
+            isLoading = false,
+            places = emptyList(),
+            error = null
+        )
+        Log.d("naver", "result cleared")
+    }
+
+    /**
+     * 국내 - 선택된 장소 저장
+     */
+    fun selectPlace(place: LocalPlace) {
+        _selectedPlace.value = place
+    }
+
+    /**
+     * 해외 - textField의 입력 값 업데이트
+     */
+    fun updateOverseas(newPlace: String) {
+        _overseasPlace.value = newPlace
+        Log.d("write", "updateOverseas - newPlace : $newPlace")
     }
 }
