@@ -24,6 +24,7 @@ import com.min.dnapp.presentation.login.LoginScreen2
 import com.min.dnapp.presentation.mypage.MypageScreen
 import com.min.dnapp.presentation.ui.component.MomentoBottomNav
 import com.min.dnapp.presentation.ui.theme.DngoTheme
+import com.min.dnapp.presentation.write.RecordWriteScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,7 +37,8 @@ class MainActivity : ComponentActivity() {
 //        enableEdgeToEdge()
         setContent {
             DngoTheme {
-                MomentoApp()
+//                MomentoApp()
+                RecordWriteScreen()
             }
         }
     }

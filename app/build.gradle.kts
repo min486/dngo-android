@@ -18,6 +18,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -34,11 +35,17 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         val kakaoNativeAppKey = properties.getProperty("kakao.native.app.key")
+        val naverClientId = properties.getProperty("naver.client.id")
+        val naverClientSecret = properties.getProperty("naver.client.secret")
 
         // 네이티브 앱 키를 BuildConfig에 필드로 추가
         buildConfigField("String", "KAKAO_NATIVE_APP_KEY", "\"${kakaoNativeAppKey}\"")
         // AndroidManifest.xml에 전달할 플레이스홀더 정의
         manifestPlaceholders["kakaoNativeAppKey"] = kakaoNativeAppKey
+
+        // 네이버
+        buildConfigField("String", "NAVER_CLIENT_ID", "\"${naverClientId}\"")
+        buildConfigField("String", "NAVER_CLIENT_SECRET", "\"${naverClientSecret}\"")
     }
 
     buildTypes {
@@ -92,6 +99,12 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     // splash screen
     implementation(libs.splash)
+    // retrofit2 & kotlin serialization
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
+    // okhttp (logging interceptor)
+    implementation(libs.okhttp.logging)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
