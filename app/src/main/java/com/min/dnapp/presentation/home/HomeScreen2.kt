@@ -34,8 +34,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.mypage.UserBadge
+import com.min.dnapp.presentation.ui.component.CustomFloatingActionButton
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.ArrowRight
 import com.min.dnapp.presentation.ui.icon.appicons.Bell
@@ -72,6 +74,13 @@ fun HomeScreen2(navController: NavHostController) {
                         contentDescription = null,
                         tint = MomentoTheme.colors.grayW60
                     )
+                }
+            )
+        },
+        floatingActionButton = {
+            CustomFloatingActionButton(
+                onClick = {
+                    navController.navigate("record_write")
                 }
             )
         }
@@ -398,6 +407,8 @@ fun HomeGrayLine(
 @Composable
 fun HomeScreen2Preview() {
     DngoTheme {
-//        HomeScreen2()
+        HomeScreen2(
+            navController = rememberNavController()
+        )
     }
 }

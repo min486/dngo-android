@@ -50,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.domain.model.EmotionType
 import com.min.dnapp.domain.model.LocalPlace
@@ -68,6 +69,7 @@ import com.min.dnapp.util.toLocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordWriteScreen(
+    navController: NavHostController,
     searchViewModel: SearchViewModel = hiltViewModel()
 ) {
     val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
@@ -110,7 +112,7 @@ fun RecordWriteScreen(
                 navigationIcon = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.popBackStack() }
                             .padding(16.dp),
                         imageVector = AppIcons.Back,
                         contentDescription = null
@@ -725,6 +727,6 @@ fun FixedSizeThumbBox() {
 @Composable
 fun RecordWriteScreenPreview() {
     DngoTheme {
-        RecordWriteScreen()
+//        RecordWriteScreen()
     }
 }

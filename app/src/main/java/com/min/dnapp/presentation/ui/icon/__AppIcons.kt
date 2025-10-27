@@ -12,6 +12,7 @@ import com.min.dnapp.presentation.ui.icon.appicons.Home
 import com.min.dnapp.presentation.ui.icon.appicons.Kakao
 import com.min.dnapp.presentation.ui.icon.appicons.More
 import com.min.dnapp.presentation.ui.icon.appicons.My
+import com.min.dnapp.presentation.ui.icon.appicons.Pen
 import com.min.dnapp.presentation.ui.icon.appicons.PenSmall
 import com.min.dnapp.presentation.ui.icon.appicons.RecordBest
 import com.min.dnapp.presentation.ui.icon.appicons.RecordBookmark
@@ -31,7 +32,7 @@ public val AppIcons.AllIcons: ____KtList<ImageVector>
       return __AllIcons!!
     }
     __AllIcons= listOf(ArrowRight, Back, Bell, Calendar, Delete, Explore, Gallery, Home, Kakao,
-        More, My, PenSmall, RecordBest, RecordBookmark, RecordComment, RecordLike, RecordSurprise,
-        Year)
+        More, My, Pen, PenSmall, RecordBest, RecordBookmark, RecordComment, RecordLike,
+        RecordSurprise, Year)
     return __AllIcons!!
   }
