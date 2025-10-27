@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +51,8 @@ fun MomentoBottomNav(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
+        HorizontalDivider(thickness = 1.dp, color = MomentoTheme.colors.grayW90)
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()

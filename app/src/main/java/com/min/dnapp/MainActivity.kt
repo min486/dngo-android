@@ -37,8 +37,7 @@ class MainActivity : ComponentActivity() {
 //        enableEdgeToEdge()
         setContent {
             DngoTheme {
-//                MomentoApp()
-                RecordWriteScreen()
+                MomentoApp()
             }
         }
     }
@@ -79,8 +78,8 @@ fun MomentoApp(
             modifier = Modifier.padding(paddingValues),
             navController = navController,
 //            startDestination = startDestination
-//            startDestination = "home"
-            startDestination = "login"
+            startDestination = "home"
+//            startDestination = "login"
         ) {
             composable("login") {
                 LoginScreen2(navController = navController)
@@ -99,6 +98,9 @@ fun MomentoApp(
             }
             composable("explore_detail") {
                 FindDetailScreen(navController = navController)
+            }
+            composable("record_write") {
+                RecordWriteScreen(navController = navController)
             }
         }
     }
