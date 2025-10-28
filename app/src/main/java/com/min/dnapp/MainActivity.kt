@@ -55,7 +55,7 @@ fun MomentoApp(
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     val showBottomBar = when (currentRoute) {
-        "login", "bell", "explore_detail" -> false
+        "login", "bell", "explore_detail", "record_write" -> false
         else -> true
     }
 

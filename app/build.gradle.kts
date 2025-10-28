@@ -105,6 +105,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     // okhttp (logging interceptor)
     implementation(libs.okhttp.logging)
+    // coil
+    implementation(libs.coil)
+    implementation(libs.coil.okhttp)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

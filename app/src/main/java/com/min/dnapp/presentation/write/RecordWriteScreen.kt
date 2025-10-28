@@ -1,6 +1,7 @@
 package com.min.dnapp.presentation.write
 
-import android.content.Intent
+import   android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,9 +20,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -49,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import com.min.dnapp.R
 import com.min.dnapp.domain.model.EmotionType
 import com.min.dnapp.domain.model.LocalPlace
@@ -155,12 +160,23 @@ fun RecordWriteScreen(
                     )
                 }
             )
+        },
+        bottomBar = {
+            // 이미지 아이콘 & 공유여부 스위치 영역
+            ImageAndShareSection(
+                isChecked = uiState.isShareChecked,
+                onCheckedChange = { newChecked ->
+                    viewModel.updateShare(newChecked)
+                },
+                onGalleryClick = { viewModel.onGalleryIconClicked() }
+            )
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
@@ -213,21 +229,13 @@ fun RecordWriteScreen(
 
                 // 내용 영역
                 WriteContentSection(
+                    selectedImageUri = uiState.selectedImageUri,
                     recordContent = uiState.recordContent,
                     onValueChange = { newValue ->
                         viewModel.updateContent(newValue)
                     }
                 )
             }
-
-            // 이미지 아이콘 & 공유여부 스위치 영역
-            ImageAndShareSection(
-                isChecked = uiState.isShareChecked,
-                onCheckedChange = { newChecked ->
-                    viewModel.updateShare(newChecked)
-                },
-                onGalleryClick = { viewModel.onGalleryIconClicked() }
-            )
         }
     }
 
@@ -666,6 +674,7 @@ fun WriteTitleSection(
 
 @Composable
 fun WriteContentSection(
+    selectedImageUri: Uri?,
     recordContent: String,
     onValueChange: (String) -> Unit
 ) {
@@ -682,8 +691,8 @@ fun WriteContentSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(310.dp)
-                .background(color = MomentoTheme.colors.brownBg, shape = RoundedCornerShape(5.dp))
-                .padding(12.dp)
+                .background(color = MomentoTheme.colors.brownBg)
+                .padding(16.dp)
         ) {
             if (recordContent.isEmpty()) {
                 Text(
@@ -699,6 +708,22 @@ fun WriteContentSection(
                 textStyle = MomentoTheme.typography.body02,
                 singleLine = false
             )
+        }
+        // 선택된 이미지
+        selectedImageUri?.let { uri ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = MomentoTheme.colors.brownBg)
+                    .padding(start = 16.dp, bottom = 16.dp)
+            ) {
+                AsyncImage(
+                    model = uri,
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
     }
 }
