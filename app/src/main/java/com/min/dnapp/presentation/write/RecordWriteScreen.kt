@@ -1,5 +1,9 @@
 package com.min.dnapp.presentation.write
 
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,6 +40,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -72,6 +78,7 @@ fun RecordWriteScreen(
     viewModel: RecordWriteViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     // 캘린더 모달 표시상태
     var showDatePicker by remember { mutableStateOf(false) }
@@ -85,6 +92,34 @@ fun RecordWriteScreen(
         // halfExpanded 상태 건너뛰기
         skipPartiallyExpanded = true
     )
+
+    // Photo Picker 런처 등록
+    val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        // URI 결과 전달
+        viewModel.onPhotoSelected(uri)
+
+        // URI 접근권한 지속적으로 요청
+        if (uri != null) {
+            val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(uri, flags)
+        }
+    }
+
+    // Photo Picker 실행 요청
+    LaunchedEffect(viewModel.imageEvent) {
+        viewModel.imageEvent.collect { shouldLaunch ->
+            if (shouldLaunch) {
+                // Photo Picker 실행
+                singlePhotoPickerLauncher.launch(
+                    input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+                // 이벤트 처리 후 viewModel에 알림
+                viewModel.photoPickerEventHandled()
+            }
+        }
+    }
 
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
@@ -112,7 +147,7 @@ fun RecordWriteScreen(
                 actions = {
                     Text(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { }
                             .padding(16.dp),
                         text = "완료",
                         style = MomentoTheme.typography.title02,
@@ -190,7 +225,8 @@ fun RecordWriteScreen(
                 isChecked = uiState.isShareChecked,
                 onCheckedChange = { newChecked ->
                     viewModel.updateShare(newChecked)
-                }
+                },
+                onGalleryClick = { viewModel.onGalleryIconClicked() }
             )
         }
     }
@@ -670,7 +706,8 @@ fun WriteContentSection(
 @Composable
 fun ImageAndShareSection(
     isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    onGalleryClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -681,8 +718,8 @@ fun ImageAndShareSection(
     ) {
         Icon(
             modifier = Modifier
-                .clickable {  }
-                .padding(20.dp),
+                .clickable { onGalleryClick() }
+                .padding(horizontal = 20.dp, vertical = 10.dp),
             imageVector = AppIcons.Gallery,
             contentDescription = null,
             tint = MomentoTheme.colors.grayW60

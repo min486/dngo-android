@@ -1,5 +1,6 @@
 package com.min.dnapp.presentation.write
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,10 @@ class RecordWriteViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(RecordWriteUiState())
     val uiState: StateFlow<RecordWriteUiState> = _uiState.asStateFlow()
+
+    // Photo Picker를 실행하도록 요청하는 이벤트
+    private val _imageEvent = MutableStateFlow(false)
+    val imageEvent: StateFlow<Boolean> = _imageEvent.asStateFlow()
 
     // 이전 검색 작업을 취소하기 위한 Job
     private var searchJob: Job? = null
@@ -177,5 +182,27 @@ class RecordWriteViewModel @Inject constructor(
     fun updateShare(newChecked: Boolean) {
         _uiState.value = _uiState.value.copy(isShareChecked = newChecked)
         Log.d("write", "updateShare - newChecked : $newChecked")
+    }
+
+    /**
+     * 갤러리 아이콘 클릭 - Photo Picker 실행 요청
+     */
+    fun onGalleryIconClicked() {
+        _imageEvent.value = true
+    }
+
+    /**
+     * Photo Picker 실행 이벤트가 처리되었음을 알림
+     */
+    fun photoPickerEventHandled() {
+        _imageEvent.value = false
+    }
+
+    /**
+     * Photo Picker에서 선택된 URI를 받아 상태 업데이트
+     */
+    fun onPhotoSelected(uri: Uri?) {
+        _uiState.value = _uiState.value.copy(selectedImageUri = uri)
+        Log.d("write", "onPhotoSelected - uri : $uri")
     }
 }
