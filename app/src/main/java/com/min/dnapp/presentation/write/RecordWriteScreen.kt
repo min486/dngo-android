@@ -1,6 +1,5 @@
 package com.min.dnapp.presentation.write
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -70,25 +69,17 @@ import com.min.dnapp.util.toLocalDate
 @Composable
 fun RecordWriteScreen(
     navController: NavHostController,
-    searchViewModel: SearchViewModel = hiltViewModel()
+    viewModel: RecordWriteViewModel = hiltViewModel()
 ) {
-    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
-    val selectedPlace by searchViewModel.selectedPlace.collectAsStateWithLifecycle()
-    val overseasPlace by searchViewModel.overseasPlace.collectAsStateWithLifecycle()
-    val recordTitle by searchViewModel.recordTitle.collectAsStateWithLifecycle()
-    val recordContent by searchViewModel.recordContent.collectAsStateWithLifecycle()
-    val selectedEmotion by searchViewModel.selectedEmotion.collectAsStateWithLifecycle()
-    val selectedWeather by searchViewModel.selectedWeather.collectAsStateWithLifecycle()
-    val isChecked by searchViewModel.isChecked.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // 캘린더
+    // 캘린더 모달 표시상태
     var showDatePicker by remember { mutableStateOf(false) }
-    val dateRangePickerState = rememberDateRangePickerState()
 
     var showEmotionBottomSheet by remember { mutableStateOf(false) }
     var showWeatherBottomSheet by remember { mutableStateOf(false) }
 
-    // 여행지 - 위치 추가
+    // 여행지 추가 모달 표시상태
     var showPlaceBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         // halfExpanded 상태 건너뛰기
@@ -146,8 +137,8 @@ fun RecordWriteScreen(
 
                 // 날짜 영역
                 WriteDateSection(
-                    startMillis = dateRangePickerState.selectedStartDateMillis,
-                    endMillis = dateRangePickerState.selectedEndDateMillis,
+                    startMillis = uiState.selectedStartDateMillis,
+                    endMillis = uiState.selectedEndDateMillis,
                     onClick = { showDatePicker = true }
                 )
 
@@ -155,8 +146,8 @@ fun RecordWriteScreen(
 
                 // 감정 & 날씨 영역
                 EmotionAndWeatherSection(
-                    selectedEmotion = selectedEmotion,
-                    selectedWeather = selectedWeather,
+                    selectedEmotion = uiState.selectedEmotion,
+                    selectedWeather = uiState.selectedWeather,
                     onClickEmotion = { showEmotionBottomSheet = true },
                     onClickWeather = { showWeatherBottomSheet = true }
                 )
@@ -165,9 +156,9 @@ fun RecordWriteScreen(
 
                 // 제목 영역
                 WriteTitleSection(
-                    recordTitle = recordTitle,
+                    recordTitle = uiState.recordTitle,
                     onValueChange = { newValue ->
-                        searchViewModel.updateTitle(newValue)
+                        viewModel.updateTitle(newValue)
                     }
                 )
 
@@ -175,10 +166,10 @@ fun RecordWriteScreen(
 
                 // 여행지 영역
                 WritePlaceSection(
-                    selectedPlace = selectedPlace,
-                    overseasPlace = overseasPlace,
+                    selectedPlace = uiState.selectedPlace,
+                    overseasPlace = uiState.overseasPlace,
                     onValueChange = { newValue ->
-                        searchViewModel.updateOverseas(newValue)
+                        viewModel.updateOverseas(newValue)
                     },
                     onClick = { showPlaceBottomSheet = true }
                 )
@@ -187,30 +178,45 @@ fun RecordWriteScreen(
 
                 // 내용 영역
                 WriteContentSection(
-                    recordContent = recordContent,
+                    recordContent = uiState.recordContent,
                     onValueChange = { newValue ->
-                        searchViewModel.updateContent(newValue)
+                        viewModel.updateContent(newValue)
                     }
                 )
             }
 
             // 이미지 아이콘 & 공유여부 스위치 영역
             ImageAndShareSection(
-                isChecked = isChecked,
+                isChecked = uiState.isShareChecked,
                 onCheckedChange = { newChecked ->
-                    searchViewModel.updateShare(newChecked)
+                    viewModel.updateShare(newChecked)
                 }
             )
         }
     }
 
-    // 캘린더(날짜 선택) 모달
+    // 캘린더 모달
     if (showDatePicker) {
+        val dateRangePickerState = rememberDateRangePickerState(
+            initialSelectedStartDateMillis = uiState.selectedStartDateMillis,
+            initialSelectedEndDateMillis = uiState.selectedEndDateMillis
+        )
+
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(
-                    onClick = { showDatePicker = false }
+                    onClick = {
+                        val startMillis = dateRangePickerState.selectedStartDateMillis
+                        val endMillis = dateRangePickerState.selectedEndDateMillis
+
+                        viewModel.updateDateRange(
+                            startDateMillis = startMillis,
+                            endDateMillis = endMillis
+                        )
+
+                        showDatePicker = false
+                    }
                 ) {
                     Text(
                         text = "확인",
@@ -274,7 +280,7 @@ fun RecordWriteScreen(
         ) {
             EmotionBottomSheetContent(
                 onConfirm = { emotionType ->
-                    searchViewModel.selectEmotion(emotionType)
+                    viewModel.updateEmotion(emotionType)
                     showEmotionBottomSheet = false
                 }
             )
@@ -291,7 +297,7 @@ fun RecordWriteScreen(
         ) {
             WeatherBottomSheetContent (
                 onConfirm = { weatherType ->
-                    searchViewModel.selectWeather(weatherType)
+                    viewModel.updateWeather(weatherType)
                     showWeatherBottomSheet = false
                 }
             )
@@ -308,18 +314,17 @@ fun RecordWriteScreen(
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
             PlaceBottomSheetContent(
-                value = searchState.query,
-                places = searchState.places,
+                value = uiState.searchState.query,
+                places = uiState.searchState.places,
                 onValueChange = { newValue ->
-                    Log.e("naver", "newValue : $newValue")
-                    searchViewModel.updateQuery(newValue)
+                    viewModel.updateQuery(newValue)
                 },
-                onSearch = { searchViewModel.searchPlace() },
-                onClear = { searchViewModel.clearSearchResult() },
+                onSearch = { viewModel.searchPlace() },
+                onClear = { viewModel.clearSearchResult() },
                 onConfirm = { place ->
-                    searchViewModel.selectPlace(place)
+                    viewModel.updatePlace(place)
                     showPlaceBottomSheet = false
-                },
+                }
             )
         }
     }
