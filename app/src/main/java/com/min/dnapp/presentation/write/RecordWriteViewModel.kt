@@ -8,19 +8,25 @@ import com.min.dnapp.domain.model.EmotionType
 import com.min.dnapp.domain.model.LocalPlace
 import com.min.dnapp.domain.model.WeatherType
 import com.min.dnapp.domain.usecase.LocalSearchUseCase
+import com.min.dnapp.domain.usecase.SaveRecordUseCase
 import com.min.dnapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class RecordWriteViewModel @Inject constructor(
-    private val localSearchUseCase: LocalSearchUseCase
+    private val localSearchUseCase: LocalSearchUseCase,
+    private val saveRecordUseCase: SaveRecordUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecordWriteUiState())
@@ -204,5 +210,28 @@ class RecordWriteViewModel @Inject constructor(
     fun onPhotoSelected(uri: Uri?) {
         _uiState.value = _uiState.value.copy(selectedImageUri = uri)
         Log.d("write", "onPhotoSelected - uri : $uri")
+    }
+
+    /**
+     * Firebase에 기록 저장
+     */
+    fun saveRecord() {
+        // 중복 저장 방지
+        if (uiState.value.isSaving) return
+
+        val currentUiState = uiState.value
+        val imageUrl = currentUiState.selectedImageUri
+
+        _uiState.update { it.copy(isSaving = true) }
+
+        viewModelScope.launch {
+            try {
+                saveRecordUseCase(currentUiState, imageUrl)
+            } catch (e: Exception) {
+                Log.e("write", "saveRecord - exception : $e")
+            } finally {
+                _uiState.update { it.copy(isSaving = false) }
+            }
+        }
     }
 }

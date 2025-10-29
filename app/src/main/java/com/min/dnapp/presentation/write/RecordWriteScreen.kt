@@ -152,7 +152,9 @@ fun RecordWriteScreen(
                 actions = {
                     Text(
                         modifier = Modifier
-                            .clickable { }
+                            .clickable {
+                                viewModel.saveRecord()
+                            }
                             .padding(16.dp),
                         text = "완료",
                         style = MomentoTheme.typography.title02,

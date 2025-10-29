@@ -77,8 +77,8 @@ fun MomentoApp(
         NavHost(
             modifier = Modifier.padding(paddingValues),
             navController = navController,
-//            startDestination = startDestination
-            startDestination = "home"
+            startDestination = startDestination
+//            startDestination = "home"
 //            startDestination = "login"
         ) {
             composable("login") {

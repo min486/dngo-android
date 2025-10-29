@@ -238,4 +238,11 @@ class AuthRepositoryImpl @Inject constructor(
                 }
             }
     }
+
+    /**
+     * 현재 로그인된 사용자의 UID를 반환
+     */
+    override suspend fun getCurrentUserId(): String? {
+        return firebaseAuth.currentUser?.uid
+    }
 }

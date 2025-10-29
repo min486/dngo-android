@@ -2,8 +2,10 @@ package com.min.dnapp.data.di
 
 import com.min.dnapp.data.repository.AuthRepositoryImpl
 import com.min.dnapp.data.repository.LocalSearchRepositoryImpl
+import com.min.dnapp.data.repository.RecordRepositoryImpl
 import com.min.dnapp.domain.repository.AuthRepository
 import com.min.dnapp.domain.repository.LocalSearchRepository
+import com.min.dnapp.domain.repository.RecordRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -25,4 +27,10 @@ abstract class RepositoryModule {
     abstract fun bindLocalSearchRepository(
         localSearchRepositoryImpl: LocalSearchRepositoryImpl
     ): LocalSearchRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRecordRepository(
+        recordRepositoryImpl: RecordRepositoryImpl
+    ): RecordRepository
 }
