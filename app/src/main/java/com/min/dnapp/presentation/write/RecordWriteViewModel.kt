@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,6 +36,9 @@ class RecordWriteViewModel @Inject constructor(
     // Photo Picker를 실행하도록 요청하는 이벤트
     private val _imageEvent = MutableStateFlow(false)
     val imageEvent: StateFlow<Boolean> = _imageEvent.asStateFlow()
+
+    private val _completeSaveRecord = Channel<Unit>()
+    val completeSaveRecordFlow = _completeSaveRecord.receiveAsFlow()
 
     // 이전 검색 작업을 취소하기 위한 Job
     private var searchJob: Job? = null
@@ -225,13 +229,17 @@ class RecordWriteViewModel @Inject constructor(
         _uiState.update { it.copy(isSaving = true) }
 
         viewModelScope.launch {
-            try {
-                saveRecordUseCase(currentUiState, imageUrl)
-            } catch (e: Exception) {
-                Log.e("write", "saveRecord - exception : $e")
-            } finally {
-                _uiState.update { it.copy(isSaving = false) }
+            val result = saveRecordUseCase(currentUiState, imageUrl)
+
+            result.onSuccess {
+                // 저장 성공
+                _completeSaveRecord.send(Unit)
+            }.onFailure { exception ->
+                // 저장 실패
+                Log.e("write", "saveRecord - exception : $exception")
             }
+
+            _uiState.update { it.copy(isSaving = false) }
         }
     }
 }

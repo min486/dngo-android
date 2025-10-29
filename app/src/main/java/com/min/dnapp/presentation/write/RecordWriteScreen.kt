@@ -2,6 +2,7 @@ package com.min.dnapp.presentation.write
 
 import   android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -122,6 +123,19 @@ fun RecordWriteScreen(
                 )
                 // 이벤트 처리 후 viewModel에 알림
                 viewModel.photoPickerEventHandled()
+            }
+        }
+    }
+
+    // 1회성 이벤트 Flow 수집 및 처리
+    LaunchedEffect(Unit) {
+        // 구독
+        viewModel.completeSaveRecordFlow.collect {
+            // 기록저장 성공 후 화면 이동
+            navController.navigate("write_finish") {
+                popUpTo("record_write") {
+                    inclusive = true
+                }
             }
         }
     }
