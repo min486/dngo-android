@@ -25,6 +25,7 @@ import com.min.dnapp.presentation.mypage.MypageScreen
 import com.min.dnapp.presentation.ui.component.MomentoBottomNav
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.write.RecordWriteScreen
+import com.min.dnapp.presentation.write.WriteFinishScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -55,7 +56,7 @@ fun MomentoApp(
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     val showBottomBar = when (currentRoute) {
-        "login", "bell", "explore_detail" -> false
+        "login", "bell", "explore_detail", "record_write", "write_finish" -> false
         else -> true
     }
 
@@ -77,8 +78,8 @@ fun MomentoApp(
         NavHost(
             modifier = Modifier.padding(paddingValues),
             navController = navController,
-//            startDestination = startDestination
-            startDestination = "home"
+            startDestination = startDestination
+//            startDestination = "home"
 //            startDestination = "login"
         ) {
             composable("login") {
@@ -101,6 +102,9 @@ fun MomentoApp(
             }
             composable("record_write") {
                 RecordWriteScreen(navController = navController)
+            }
+            composable("write_finish") {
+                WriteFinishScreen(navController = navController)
             }
         }
     }

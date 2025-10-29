@@ -1,6 +1,11 @@
 package com.min.dnapp.presentation.write
 
+import   android.content.Intent
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,9 +21,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -37,6 +44,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,12 +53,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImage
 import com.min.dnapp.R
 import com.min.dnapp.domain.model.EmotionType
 import com.min.dnapp.domain.model.LocalPlace
@@ -70,30 +81,64 @@ import com.min.dnapp.util.toLocalDate
 @Composable
 fun RecordWriteScreen(
     navController: NavHostController,
-    searchViewModel: SearchViewModel = hiltViewModel()
+    viewModel: RecordWriteViewModel = hiltViewModel()
 ) {
-    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
-    val selectedPlace by searchViewModel.selectedPlace.collectAsStateWithLifecycle()
-    val overseasPlace by searchViewModel.overseasPlace.collectAsStateWithLifecycle()
-    val recordTitle by searchViewModel.recordTitle.collectAsStateWithLifecycle()
-    val recordContent by searchViewModel.recordContent.collectAsStateWithLifecycle()
-    val selectedEmotion by searchViewModel.selectedEmotion.collectAsStateWithLifecycle()
-    val selectedWeather by searchViewModel.selectedWeather.collectAsStateWithLifecycle()
-    val isChecked by searchViewModel.isChecked.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
-    // 캘린더
+    // 캘린더 모달 표시상태
     var showDatePicker by remember { mutableStateOf(false) }
-    val dateRangePickerState = rememberDateRangePickerState()
 
     var showEmotionBottomSheet by remember { mutableStateOf(false) }
     var showWeatherBottomSheet by remember { mutableStateOf(false) }
 
-    // 여행지 - 위치 추가
+    // 여행지 추가 모달 표시상태
     var showPlaceBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         // halfExpanded 상태 건너뛰기
         skipPartiallyExpanded = true
     )
+
+    // Photo Picker 런처 등록
+    val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        // URI 결과 전달
+        viewModel.onPhotoSelected(uri)
+
+        // URI 접근권한 지속적으로 요청
+        if (uri != null) {
+            val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(uri, flags)
+        }
+    }
+
+    // Photo Picker 실행 요청
+    LaunchedEffect(viewModel.imageEvent) {
+        viewModel.imageEvent.collect { shouldLaunch ->
+            if (shouldLaunch) {
+                // Photo Picker 실행
+                singlePhotoPickerLauncher.launch(
+                    input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+                // 이벤트 처리 후 viewModel에 알림
+                viewModel.photoPickerEventHandled()
+            }
+        }
+    }
+
+    // 1회성 이벤트 Flow 수집 및 처리
+    LaunchedEffect(Unit) {
+        // 구독
+        viewModel.completeSaveRecordFlow.collect {
+            // 기록저장 성공 후 화면 이동
+            navController.navigate("write_finish") {
+                popUpTo("record_write") {
+                    inclusive = true
+                }
+            }
+        }
+    }
 
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
@@ -121,7 +166,9 @@ fun RecordWriteScreen(
                 actions = {
                     Text(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable {
+                                viewModel.saveRecord()
+                            }
                             .padding(16.dp),
                         text = "완료",
                         style = MomentoTheme.typography.title02,
@@ -129,12 +176,23 @@ fun RecordWriteScreen(
                     )
                 }
             )
+        },
+        bottomBar = {
+            // 이미지 아이콘 & 공유여부 스위치 영역
+            ImageAndShareSection(
+                isChecked = uiState.isShareChecked,
+                onCheckedChange = { newChecked ->
+                    viewModel.updateShare(newChecked)
+                },
+                onGalleryClick = { viewModel.onGalleryIconClicked() }
+            )
         }
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
@@ -146,8 +204,8 @@ fun RecordWriteScreen(
 
                 // 날짜 영역
                 WriteDateSection(
-                    startMillis = dateRangePickerState.selectedStartDateMillis,
-                    endMillis = dateRangePickerState.selectedEndDateMillis,
+                    startMillis = uiState.selectedStartDateMillis,
+                    endMillis = uiState.selectedEndDateMillis,
                     onClick = { showDatePicker = true }
                 )
 
@@ -155,8 +213,8 @@ fun RecordWriteScreen(
 
                 // 감정 & 날씨 영역
                 EmotionAndWeatherSection(
-                    selectedEmotion = selectedEmotion,
-                    selectedWeather = selectedWeather,
+                    selectedEmotion = uiState.selectedEmotion,
+                    selectedWeather = uiState.selectedWeather,
                     onClickEmotion = { showEmotionBottomSheet = true },
                     onClickWeather = { showWeatherBottomSheet = true }
                 )
@@ -165,9 +223,9 @@ fun RecordWriteScreen(
 
                 // 제목 영역
                 WriteTitleSection(
-                    recordTitle = recordTitle,
+                    recordTitle = uiState.recordTitle,
                     onValueChange = { newValue ->
-                        searchViewModel.updateTitle(newValue)
+                        viewModel.updateTitle(newValue)
                     }
                 )
 
@@ -175,10 +233,10 @@ fun RecordWriteScreen(
 
                 // 여행지 영역
                 WritePlaceSection(
-                    selectedPlace = selectedPlace,
-                    overseasPlace = overseasPlace,
+                    selectedPlace = uiState.selectedPlace,
+                    overseasPlace = uiState.overseasPlace,
                     onValueChange = { newValue ->
-                        searchViewModel.updateOverseas(newValue)
+                        viewModel.updateOverseas(newValue)
                     },
                     onClick = { showPlaceBottomSheet = true }
                 )
@@ -187,30 +245,38 @@ fun RecordWriteScreen(
 
                 // 내용 영역
                 WriteContentSection(
-                    recordContent = recordContent,
+                    selectedImageUri = uiState.selectedImageUri,
+                    recordContent = uiState.recordContent,
                     onValueChange = { newValue ->
-                        searchViewModel.updateContent(newValue)
+                        viewModel.updateContent(newValue)
                     }
                 )
             }
-
-            // 이미지 아이콘 & 공유여부 스위치 영역
-            ImageAndShareSection(
-                isChecked = isChecked,
-                onCheckedChange = { newChecked ->
-                    searchViewModel.updateShare(newChecked)
-                }
-            )
         }
     }
 
-    // 캘린더(날짜 선택) 모달
+    // 캘린더 모달
     if (showDatePicker) {
+        val dateRangePickerState = rememberDateRangePickerState(
+            initialSelectedStartDateMillis = uiState.selectedStartDateMillis,
+            initialSelectedEndDateMillis = uiState.selectedEndDateMillis
+        )
+
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(
-                    onClick = { showDatePicker = false }
+                    onClick = {
+                        val startMillis = dateRangePickerState.selectedStartDateMillis
+                        val endMillis = dateRangePickerState.selectedEndDateMillis
+
+                        viewModel.updateDateRange(
+                            startDateMillis = startMillis,
+                            endDateMillis = endMillis
+                        )
+
+                        showDatePicker = false
+                    }
                 ) {
                     Text(
                         text = "확인",
@@ -274,7 +340,7 @@ fun RecordWriteScreen(
         ) {
             EmotionBottomSheetContent(
                 onConfirm = { emotionType ->
-                    searchViewModel.selectEmotion(emotionType)
+                    viewModel.updateEmotion(emotionType)
                     showEmotionBottomSheet = false
                 }
             )
@@ -291,7 +357,7 @@ fun RecordWriteScreen(
         ) {
             WeatherBottomSheetContent (
                 onConfirm = { weatherType ->
-                    searchViewModel.selectWeather(weatherType)
+                    viewModel.updateWeather(weatherType)
                     showWeatherBottomSheet = false
                 }
             )
@@ -308,18 +374,17 @@ fun RecordWriteScreen(
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
             PlaceBottomSheetContent(
-                value = searchState.query,
-                places = searchState.places,
+                value = uiState.searchState.query,
+                places = uiState.searchState.places,
                 onValueChange = { newValue ->
-                    Log.e("naver", "newValue : $newValue")
-                    searchViewModel.updateQuery(newValue)
+                    viewModel.updateQuery(newValue)
                 },
-                onSearch = { searchViewModel.searchPlace() },
-                onClear = { searchViewModel.clearSearchResult() },
+                onSearch = { viewModel.searchPlace() },
+                onClear = { viewModel.clearSearchResult() },
                 onConfirm = { place ->
-                    searchViewModel.selectPlace(place)
+                    viewModel.updatePlace(place)
                     showPlaceBottomSheet = false
-                },
+                }
             )
         }
     }
@@ -625,6 +690,7 @@ fun WriteTitleSection(
 
 @Composable
 fun WriteContentSection(
+    selectedImageUri: Uri?,
     recordContent: String,
     onValueChange: (String) -> Unit
 ) {
@@ -641,8 +707,8 @@ fun WriteContentSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(310.dp)
-                .background(color = MomentoTheme.colors.brownBg, shape = RoundedCornerShape(5.dp))
-                .padding(12.dp)
+                .background(color = MomentoTheme.colors.brownBg)
+                .padding(16.dp)
         ) {
             if (recordContent.isEmpty()) {
                 Text(
@@ -659,13 +725,30 @@ fun WriteContentSection(
                 singleLine = false
             )
         }
+        // 선택된 이미지
+        selectedImageUri?.let { uri ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = MomentoTheme.colors.brownBg)
+                    .padding(start = 16.dp, bottom = 16.dp)
+            ) {
+                AsyncImage(
+                    model = uri,
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
     }
 }
 
 @Composable
 fun ImageAndShareSection(
     isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    onGalleryClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -676,8 +759,8 @@ fun ImageAndShareSection(
     ) {
         Icon(
             modifier = Modifier
-                .clickable {  }
-                .padding(20.dp),
+                .clickable { onGalleryClick() }
+                .padding(horizontal = 20.dp, vertical = 10.dp),
             imageVector = AppIcons.Gallery,
             contentDescription = null,
             tint = MomentoTheme.colors.grayW60

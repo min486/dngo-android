@@ -24,14 +24,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 import com.min.dnapp.presentation.write.component.WriteStampDialog
 
 @Composable
-fun WriteFinishScreen() {
-
+fun WriteFinishScreen(
+    navController: NavHostController
+) {
     var showStampDialog by remember { mutableStateOf(true) }
 
     Surface(
@@ -67,7 +69,9 @@ fun WriteFinishScreen() {
             ) {
                 Box(
                     modifier = Modifier
-                        .clickable {  }
+                        .clickable {
+                            navController.navigate("home")
+                        }
                         .fillMaxWidth()
                         .background(color = MomentoTheme.colors.brownBase, shape = RoundedCornerShape(10.dp))
                         .padding(vertical = 16.dp),
@@ -97,6 +101,6 @@ fun WriteFinishScreen() {
 @Composable
 fun WriteFinishScreenPreview() {
     DngoTheme {
-        WriteFinishScreen()
+//        WriteFinishScreen()
     }
 }

@@ -89,6 +89,7 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     // kakao
     implementation(libs.kakao.sdk)
     // compose navigation
@@ -105,6 +106,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     // okhttp (logging interceptor)
     implementation(libs.okhttp.logging)
+    // coil
+    implementation(libs.coil)
+    implementation(libs.coil.okhttp)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
