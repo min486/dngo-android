@@ -1,11 +1,11 @@
 package com.min.dnapp.presentation.login
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.min.dnapp.domain.model.UserProfile
 import com.min.dnapp.domain.usecase.LogoutUseCase
-import com.min.dnapp.domain.usecase.SignInWithKakaoUseCase
+import com.min.dnapp.domain.usecase.AuthWithKakaoUseCase
 import com.min.dnapp.domain.usecase.UnlinkUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,74 +16,92 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val signInWithKakaoUseCase: SignInWithKakaoUseCase,
+    private val authWithKakaoUseCase: AuthWithKakaoUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val unlinkUseCase: UnlinkUseCase
 ) : ViewModel() {
 
-    // 로그인 결과 저장
-    private val _loginResult = MutableStateFlow<Result<UserProfile>?>(null)
-    val loginResult: StateFlow<Result<UserProfile>?> = _loginResult.asStateFlow()
-
-    // 로딩 상태 관리
+    // 로딩 상태
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     /**
-     * 카카오 로그인 버튼 클릭 시 호출
+     * 카카오 로그인
      */
-    fun onKakaoLoginClicked(context: Context) {
+    fun onKakaoLoginClicked(
+        context: Context,
+        onSuccess: () -> Unit,
+        onFailure: (Throwable) -> Unit
+    ) {
         viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                _loginResult.value = null
+            _isLoading.value = true
 
-                val result = signInWithKakaoUseCase(context)
-                _loginResult.value = result
+            try {
+                val result = authWithKakaoUseCase(context)
+                Log.d("auth", "onKakaoLoginClicked - result : $result")
+
+                result.onSuccess {
+                    onSuccess()
+                }.onFailure { exception ->
+                    onFailure(exception)
+                }
             } catch (e: Exception) {
-                _loginResult.value = Result.failure(e)
+                Log.e("auth", "onKakaoLoginClicked - unexpected error", e)
+                onFailure(e)
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    // 로그인 결과 상태를 초기화
-    fun clearLoginResult() {
-        _loginResult.value = null
-    }
-
     /**
-     * 로그아웃 버튼 클릭 시 호출
+     * 로그아웃 처리
+     * - 카카오 SDK 로그아웃
+     * - firebase auth 로그아웃
      */
-    fun onLogoutClicked(onSuccess: () -> Unit, onFailure: (Throwable) -> Unit) {
+    fun onLogoutClicked(
+        onSuccess: () -> Unit,
+        onFailure: (Throwable) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val result = logoutUseCase()
+                Log.d("auth", "onLogoutClicked - result : $result")
+
                 result.onSuccess {
                     onSuccess()
                 }.onFailure { exception ->
                     onFailure(exception)
                 }
             } catch (e: Exception) {
+                Log.e("auth", "onLogoutClicked - unexpected error", e)
                 onFailure(e)
             }
         }
     }
 
     /**
-     * 회원탈퇴 버튼 클릭 시 호출
+     * 회원탈퇴 처리
+     * - firebase auth 사용자 삭제
+     * - firestore "users" 문서 삭제
+     * - 카카오 연결 끊기
      */
-    fun onUnlinkClicked(onSuccess: () -> Unit, onFailure: (Throwable) -> Unit) {
+    fun onUnlinkClicked(
+        onSuccess: () -> Unit,
+        onFailure: (Throwable) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val result = unlinkUseCase()
+                Log.d("auth", "onUnlinkClicked - result : $result")
+
                 result.onSuccess {
                     onSuccess()
                 }.onFailure { exception ->
                     onFailure(exception)
                 }
             } catch (e: Exception) {
+                Log.e("auth", "onUnlinkClicked - unexpected error", e)
                 onFailure(e)
             }
         }

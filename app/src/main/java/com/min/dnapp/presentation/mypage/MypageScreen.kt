@@ -35,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.mypage.component.ProfileImageDialog
 import com.min.dnapp.presentation.ui.icon.AppIcons
@@ -45,8 +46,9 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MypageScreen() {
-
+fun MypageScreen(
+    navController: NavHostController
+) {
     var showProfileImageDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -96,7 +98,11 @@ fun MypageScreen() {
 
             Spacer(Modifier.height(20.dp))
 
-            MypageMenuSection()
+            MypageMenuSection(
+                onSettingClick = {
+                    navController.navigate("setting")
+                }
+            )
         }
     }
 
@@ -294,7 +300,9 @@ fun RecordAndStampNum() {
 }
 
 @Composable
-fun MypageMenuSection() {
+fun MypageMenuSection(
+    onSettingClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -312,7 +320,7 @@ fun MypageMenuSection() {
         Spacer(Modifier.height(28.dp))
         MypageMenuItem(
             text = "설정",
-            onClick = {}
+            onClick = { onSettingClick() }
         )
     }
 }
@@ -339,6 +347,6 @@ fun MypageMenuItem(
 @Composable
 fun MypageScreenPreview() {
     DngoTheme {
-        MypageScreen()
+//        MypageScreen()
     }
 }
