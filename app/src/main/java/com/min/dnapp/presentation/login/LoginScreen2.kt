@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -27,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.ui.icon.AppIcons
@@ -41,6 +45,7 @@ fun LoginScreen2(
     viewModel: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -65,6 +70,21 @@ fun LoginScreen2(
                         }
                     )
                 }
+            )
+        }
+    }
+
+    if (isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MomentoTheme.colors.black.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(40.dp),
+                color = MomentoTheme.colors.white,
+                strokeWidth = 4.dp
             )
         }
     }
@@ -140,7 +160,7 @@ fun LoginButtonSection(
                         contentDescription = null
                     )
                     Text(
-                        modifier = Modifier.fillMaxWidth( ),
+                        modifier = Modifier.fillMaxWidth(),
                         text = "카카오로 로그인하기",
                         style = MomentoTheme.typography.title02,
                         color = MomentoTheme.colors.grayW20,

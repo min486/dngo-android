@@ -21,12 +21,12 @@ class LoginViewModel @Inject constructor(
     private val unlinkUseCase: UnlinkUseCase
 ) : ViewModel() {
 
-    // 로딩 상태 관리
+    // 로딩 상태
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     /**
-     * 카카오 로그인 버튼 클릭 시 호출
+     * 카카오 로그인
      */
     fun onKakaoLoginClicked(
         context: Context,
@@ -52,11 +52,6 @@ class LoginViewModel @Inject constructor(
                 _isLoading.value = false
             }
         }
-    }
-
-    // 로그인 결과 상태를 초기화
-    fun clearLoginResult() {
-//        _loginResult.value = null
     }
 
     /**
