@@ -21,10 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.ui.icon.AppIcons
@@ -34,7 +36,12 @@ import com.min.dnapp.presentation.ui.theme.KakaoYellow
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @Composable
-fun LoginScreen2(navController: NavHostController) {
+fun LoginScreen2(
+    navController: NavHostController,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
+    val context = LocalContext.current
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MomentoTheme.colors.brownW80
@@ -46,7 +53,17 @@ fun LoginScreen2(navController: NavHostController) {
             LoginHeaderSection()
             LoginButtonSection(
                 onClick = {
-                    navController.navigate("home")
+                    viewModel.onKakaoLoginClicked(
+                        context = context,
+                        onSuccess = {
+                            navController.navigate("home") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        },
+                        onFailure = {
+
+                        }
+                    )
                 }
             )
         }

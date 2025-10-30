@@ -25,7 +25,6 @@ fun LoginScreen(
     navController: NavController
 ) {
     // viewModel의 상태를 구독
-    val loginResult by loginViewModel.loginResult.collectAsStateWithLifecycle()
     val isLoading by loginViewModel.isLoading.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -33,25 +32,25 @@ fun LoginScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     // 로그인 결과에 따른 처리
-    LaunchedEffect(loginResult) {
-        loginResult?.let { result ->
-            result.onSuccess {
-                navController.navigate("home") {
-                    popUpTo("login") { inclusive = true }
-                }
-                loginViewModel.clearLoginResult()
-            }.onFailure { exception ->
-                val errorMessage = when {
-                    exception.message?.contains("network", ignoreCase = true) == true ->
-                        "네트워크 연결을 확인해주세요"
-                    exception.message?.contains("cancelled", ignoreCase = true ) == true ->
-                        "로그인이 취소되었습니다"
-                    else -> "로그인에 실패했습니다"
-                }
-                snackbarHostState.showSnackbar(errorMessage)
-            }
-        }
-    }
+//    LaunchedEffect(loginResult) {
+//        loginResult?.let { result ->
+//            result.onSuccess {
+//                navController.navigate("home") {
+//                    popUpTo("login") { inclusive = true }
+//                }
+//                loginViewModel.clearLoginResult()
+//            }.onFailure { exception ->
+//                val errorMessage = when {
+//                    exception.message?.contains("network", ignoreCase = true) == true ->
+//                        "네트워크 연결을 확인해주세요"
+//                    exception.message?.contains("cancelled", ignoreCase = true ) == true ->
+//                        "로그인이 취소되었습니다"
+//                    else -> "로그인에 실패했습니다"
+//                }
+//                snackbarHostState.showSnackbar(errorMessage)
+//            }
+//        }
+//    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -69,7 +68,7 @@ fun LoginScreen(
             } else {
                 Button(
                     onClick = {
-                        loginViewModel.onKakaoLoginClicked(context)
+//                        loginViewModel.onKakaoLoginClicked(context)
                     }
                 ) {
                     Text("카카오 로그인")
