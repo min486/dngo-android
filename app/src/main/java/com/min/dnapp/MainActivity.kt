@@ -22,6 +22,7 @@ import com.min.dnapp.presentation.find.FindScreen
 import com.min.dnapp.presentation.home.HomeScreen2
 import com.min.dnapp.presentation.login.LoginScreen2
 import com.min.dnapp.presentation.mypage.MypageScreen
+import com.min.dnapp.presentation.mypage.SettingScreen
 import com.min.dnapp.presentation.ui.component.MomentoBottomNav
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.write.RecordWriteScreen
@@ -56,7 +57,7 @@ fun MomentoApp(
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     val showBottomBar = when (currentRoute) {
-        "login", "bell", "explore_detail", "record_write", "write_finish" -> false
+        "login", "bell", "explore_detail", "record_write", "write_finish", "setting" -> false
         else -> true
     }
 
@@ -78,8 +79,7 @@ fun MomentoApp(
         NavHost(
             modifier = Modifier.padding(paddingValues),
             navController = navController,
-//            startDestination = startDestination
-            startDestination = "login"
+            startDestination = startDestination
         ) {
             composable("login") {
                 LoginScreen2(navController = navController)
@@ -91,7 +91,7 @@ fun MomentoApp(
                 FindScreen(navController = navController)
             }
             composable("my") {
-                MypageScreen()
+                MypageScreen(navController = navController)
             }
             composable("bell") {
                 BellScreen(navController = navController)
@@ -104,6 +104,9 @@ fun MomentoApp(
             }
             composable("write_finish") {
                 WriteFinishScreen(navController = navController)
+            }
+            composable("setting") {
+                SettingScreen(navController = navController)
             }
         }
     }

@@ -18,6 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.min.dnapp.presentation.login.LoginViewModel
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Back
 import com.min.dnapp.presentation.ui.theme.DngoTheme
@@ -25,7 +28,10 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingScreen() {
+fun SettingScreen(
+    navController: NavHostController,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     Scaffold(
         containerColor = MomentoTheme.colors.brownBg,
         topBar = {
@@ -43,7 +49,7 @@ fun SettingScreen() {
                 navigationIcon = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.popBackStack() }
                             .padding(16.dp),
                         imageVector = AppIcons.Back,
                         contentDescription = null
@@ -63,7 +69,20 @@ fun SettingScreen() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {  }
+                    .clickable {
+                        viewModel.onLogoutClicked(
+                            onSuccess = {
+                                // 로그아웃 성공 후 이동
+                                navController.navigate("login") {
+                                    // 최상위 그래프의 ID까지 스택 모두 제거
+                                    popUpTo(navController.graph.id) { inclusive = true }
+                                }
+                            },
+                            onFailure = {
+
+                            }
+                        )
+                    }
             ) {
                 Text(
                     text = "로그아웃",
@@ -77,7 +96,20 @@ fun SettingScreen() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {  }
+                    .clickable {
+                        viewModel.onUnlinkClicked(
+                            onSuccess = {
+                                // 회원탈퇴 성공 후 이동
+                                navController.navigate("login") {
+                                    // 최상위 그래프의 ID까지 스택 모두 제거
+                                    popUpTo(navController.graph.id) { inclusive = true }
+                                }
+                            },
+                            onFailure = {
+
+                            }
+                        )
+                    }
             ) {
                 Text(
                     text = "계정 탈퇴",
@@ -93,6 +125,6 @@ fun SettingScreen() {
 @Composable
 fun SettingScreenPreview() {
     DngoTheme {
-        SettingScreen()
+//        SettingScreen()
     }
 }

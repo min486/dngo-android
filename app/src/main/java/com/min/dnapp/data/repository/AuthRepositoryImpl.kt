@@ -186,7 +186,7 @@ class AuthRepositoryImpl @Inject constructor(
     /**
      * firestore에 사용자 정보 저장
      */
-    override suspend fun saveNewUser(user: User) {
+    private suspend fun saveNewUser(user: User) {
         val userEntity = UserMapper.toEntity(user)
         val userId = userEntity.userId ?: throw IllegalArgumentException("saveNewUser - user ID null")
 
@@ -203,11 +203,6 @@ class AuthRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    /**
-     * 로그아웃 처리
-     * - 카카오 SDK 로그아웃
-     * - firebase auth 로그아웃
-     */
     override suspend fun logout(): Result<Unit> = suspendCancellableCoroutine { continuation ->
         // 카카오 SDK 로그아웃
         UserApiClient.instance.logout { error ->

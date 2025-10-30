@@ -55,38 +55,54 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
-     * 로그아웃 버튼 클릭 시 호출
+     * 로그아웃 처리
+     * - 카카오 SDK 로그아웃
+     * - firebase auth 로그아웃
      */
-    fun onLogoutClicked(onSuccess: () -> Unit, onFailure: (Throwable) -> Unit) {
+    fun onLogoutClicked(
+        onSuccess: () -> Unit,
+        onFailure: (Throwable) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val result = logoutUseCase()
+                Log.d("auth", "onLogoutClicked - result : $result")
+
                 result.onSuccess {
                     onSuccess()
                 }.onFailure { exception ->
                     onFailure(exception)
                 }
             } catch (e: Exception) {
+                Log.e("auth", "onLogoutClicked - unexpected error", e)
                 onFailure(e)
             }
         }
     }
 
     /**
-     * 회원탈퇴 버튼 클릭 시 호출
+     * 회원탈퇴 처리
+     * - firebase auth 사용자 삭제
+     * - firestore "users" 문서 삭제
+     * - 카카오 연결 끊기
      */
-//    fun onUnlinkClicked(onSuccess: () -> Unit, onFailure: (Throwable) -> Unit) {
-    fun onUnlinkClicked() {
+    fun onUnlinkClicked(
+        onSuccess: () -> Unit,
+        onFailure: (Throwable) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val result = unlinkUseCase()
+                Log.d("auth", "onUnlinkClicked - result : $result")
+
                 result.onSuccess {
-//                    onSuccess()
+                    onSuccess()
                 }.onFailure { exception ->
-//                    onFailure(exception)
+                    onFailure(exception)
                 }
             } catch (e: Exception) {
-//                onFailure(e)
+                Log.e("auth", "onUnlinkClicked - unexpected error", e)
+                onFailure(e)
             }
         }
     }
