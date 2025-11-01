@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
 import com.min.dnapp.data.mapper.RecordMapper
@@ -88,6 +89,7 @@ class RecordRepositoryImpl @Inject constructor(
                     .collection("records")
                     .document(userId)
                     .collection("private_records")
+                    .orderBy("startDateMillis", Query.Direction.DESCENDING)
                     .get()
                     .await()
 
