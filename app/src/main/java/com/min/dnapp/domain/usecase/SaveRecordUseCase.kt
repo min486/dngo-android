@@ -1,7 +1,7 @@
 package com.min.dnapp.domain.usecase
 
 import android.net.Uri
-import com.min.dnapp.data.mapper.toEntity
+import com.min.dnapp.data.mapper.RecordMapper
 import com.min.dnapp.domain.repository.AuthRepository
 import com.min.dnapp.domain.repository.RecordRepository
 import com.min.dnapp.presentation.write.RecordWriteUiState
@@ -26,7 +26,7 @@ class SaveRecordUseCase @Inject constructor(
             }
 
             // uiState를 Entity로 변환
-            val recordEntity = uiState.toEntity(userId, imageUrl)
+            val recordEntity = RecordMapper.toEntity(uiState, imageUrl)
 
             // 개인 기록 컬렉션에 저장 (필수)
             // recordId가 포함된 RecordEntity를 받아 새 변수에 저장
