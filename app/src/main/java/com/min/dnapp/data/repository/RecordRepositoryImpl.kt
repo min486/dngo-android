@@ -3,6 +3,7 @@ package com.min.dnapp.data.repository
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObjects
@@ -102,5 +103,21 @@ class RecordRepositoryImpl @Inject constructor(
                 return@withContext emptyList()
             }
         }
+    }
+
+    /**
+     * 기록/스탬프 수 1씩 증가
+     */
+    override suspend fun increaseRecordAndStamp() {
+        val userId = currentUserId
+        val userDoc = firestore.collection("users").document(userId)
+
+        // Map으로 업데이트할 필드와 값을 지정
+        val updateCnt = mapOf<String, Any>(
+            "recordCnt" to FieldValue.increment(1),
+            "stampCnt" to FieldValue.increment(1)
+        )
+
+        userDoc.update(updateCnt).await()
     }
 }
