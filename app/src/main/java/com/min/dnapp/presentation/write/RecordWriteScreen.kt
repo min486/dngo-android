@@ -77,6 +77,7 @@ import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 import com.min.dnapp.presentation.write.component.EmotionBottomSheetContent
 import com.min.dnapp.presentation.write.component.PlaceBottomSheetContent
+import com.min.dnapp.presentation.write.component.ShareGuide
 import com.min.dnapp.presentation.write.component.WeatherBottomSheetContent
 import com.min.dnapp.util.toLocalDate
 
@@ -90,6 +91,9 @@ fun RecordWriteScreen(
     val context = LocalContext.current
 
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // 공유 안내 말풍선 표시상태
+    var isShareGuideVisible by remember { mutableStateOf(true) }
 
     // 캘린더 모달 표시상태
     var showDatePicker by remember { mutableStateOf(false) }
@@ -193,14 +197,26 @@ fun RecordWriteScreen(
             )
         },
         bottomBar = {
-            // 이미지 아이콘 & 공유여부 스위치 영역
-            ImageAndShareSection(
-                isChecked = uiState.isShareChecked,
-                onCheckedChange = { newChecked ->
-                    viewModel.updateShare(newChecked)
-                },
-                onGalleryClick = { viewModel.onGalleryIconClicked() }
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.End
+            ) {
+                // 공유 안내 말풍선
+                if (isShareGuideVisible) {
+                    ShareGuide(
+                        onClick = { isShareGuideVisible = false }
+                    )
+                }
+
+                // 이미지 아이콘 & 공유여부 스위치 영역
+                ImageAndShareSection(
+                    isChecked = uiState.isShareChecked,
+                    onCheckedChange = { newChecked ->
+                        viewModel.updateShare(newChecked)
+                    },
+                    onGalleryClick = { viewModel.onGalleryIconClicked() }
+                )
+            }
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
