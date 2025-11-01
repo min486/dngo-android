@@ -761,7 +761,7 @@ fun WriteContentSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(310.dp)
+                .height(300.dp)
                 .background(color = MomentoTheme.colors.brownBg)
                 .padding(16.dp)
         ) {
