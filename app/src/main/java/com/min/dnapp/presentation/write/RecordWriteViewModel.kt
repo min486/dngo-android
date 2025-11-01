@@ -9,13 +9,16 @@ import com.min.dnapp.domain.model.LocalPlace
 import com.min.dnapp.domain.model.WeatherType
 import com.min.dnapp.domain.usecase.LocalSearchUseCase
 import com.min.dnapp.domain.usecase.SaveRecordUseCase
+import com.min.dnapp.presentation.common.SnackbarMessage
 import com.min.dnapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -39,6 +42,9 @@ class RecordWriteViewModel @Inject constructor(
 
     private val _completeSaveRecord = Channel<Unit>()
     val completeSaveRecordFlow = _completeSaveRecord.receiveAsFlow()
+
+    private val _snackbarMessage = MutableSharedFlow<SnackbarMessage>()
+    val snackbarMessage = _snackbarMessage.asSharedFlow()
 
     // 이전 검색 작업을 취소하기 위한 Job
     private var searchJob: Job? = null
@@ -220,6 +226,14 @@ class RecordWriteViewModel @Inject constructor(
      * Firebase에 기록 저장
      */
     fun saveRecord() {
+        // 필수 항목 미입력 시, 메시지 발행 후 종료
+        getSnackbarMessage(uiState.value)?.let { message ->
+            viewModelScope.launch {
+                _snackbarMessage.emit(message)
+            }
+            return
+        }
+
         // 중복 저장 방지
         if (uiState.value.isSaving) return
 
@@ -241,5 +255,40 @@ class RecordWriteViewModel @Inject constructor(
 
             _uiState.update { it.copy(isSaving = false) }
         }
+    }
+
+    private fun getSnackbarMessage(uiState: RecordWriteUiState): SnackbarMessage? {
+        if (uiState.recordTitle.isBlank()) {
+            return SnackbarMessage(
+                message = WriteMessage.TITLE_EMPTY
+            )
+        }
+        if (uiState.recordContent.isBlank()) {
+            return SnackbarMessage(
+                message = WriteMessage.CONTENT_EMPTY
+            )
+        }
+        if (uiState.selectedStartDateMillis == null) {
+            return SnackbarMessage(
+                message = WriteMessage.DATE_EMPTY
+            )
+        }
+        if (uiState.selectedEmotion == null) {
+            return SnackbarMessage(
+                message = WriteMessage.EMOTION_EMPTY
+            )
+        }
+        if (uiState.selectedWeather == null) {
+            return SnackbarMessage(
+                message = WriteMessage.WEATHER_EMPTY
+            )
+        }
+        if (uiState.selectedPlace == null && uiState.overseasPlace.isBlank()) {
+            return SnackbarMessage(
+                message = WriteMessage.PLACE_EMPTY
+            )
+        }
+
+        return null
     }
 }

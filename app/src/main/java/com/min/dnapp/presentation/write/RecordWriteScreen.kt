@@ -1,8 +1,7 @@
 package com.min.dnapp.presentation.write
 
-import   android.content.Intent
+import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,6 +35,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -66,6 +68,7 @@ import com.min.dnapp.R
 import com.min.dnapp.domain.model.EmotionType
 import com.min.dnapp.domain.model.LocalPlace
 import com.min.dnapp.domain.model.WeatherType
+import com.min.dnapp.presentation.ui.component.CustomSnackbar
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Back
 import com.min.dnapp.presentation.ui.icon.appicons.Calendar
@@ -85,6 +88,8 @@ fun RecordWriteScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // 캘린더 모달 표시상태
     var showDatePicker by remember { mutableStateOf(false) }
@@ -140,6 +145,16 @@ fun RecordWriteScreen(
         }
     }
 
+    // 메시지 발행을 수집하여 스낵바 표시
+    LaunchedEffect(Unit) {
+        viewModel.snackbarMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message.message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
         topBar = {
@@ -186,6 +201,13 @@ fun RecordWriteScreen(
                 },
                 onGalleryClick = { viewModel.onGalleryIconClicked() }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(
+                    snackbarData = data
+                )
+            }
         }
     ) { paddingValues ->
         Column(
