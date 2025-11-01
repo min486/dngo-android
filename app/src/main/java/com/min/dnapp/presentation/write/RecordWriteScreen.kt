@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
@@ -290,6 +291,22 @@ fun RecordWriteScreen(
                     }
                 )
             }
+        }
+    }
+
+    // 기록 등록 진행 시 로딩 인디케이터 표시
+    if (uiState.isSaving) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MomentoTheme.colors.black.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(40.dp),
+                color = MomentoTheme.colors.white,
+                strokeWidth = 4.dp
+            )
         }
     }
 
