@@ -1,17 +1,31 @@
 package com.min.dnapp.data.repository
 
 import android.net.Uri
+import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
+import com.min.dnapp.data.mapper.RecordMapper
 import com.min.dnapp.data.remote.dto.RecordEntity
+import com.min.dnapp.domain.model.TripRecord
 import com.min.dnapp.domain.repository.RecordRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RecordRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val storage: FirebaseStorage
+    private val storage: FirebaseStorage,
+    private val firebaseAuth: FirebaseAuth
 ) : RecordRepository {
+
+    // 현재 로그인된 사용자 ID 가져오기
+    private val currentUserId: String
+        get() = firebaseAuth.currentUser?.uid ?: throw IllegalStateException("user not authenticated")
+
     /**
      * Storage에 이미지 업로드 및 URL 반환
      */
@@ -31,7 +45,13 @@ class RecordRepositoryImpl @Inject constructor(
      * 개인 기록 컬렉션에 저장
      */
     override suspend fun savePrivateRecord(record: RecordEntity): RecordEntity {
-        val recordCollection = firestore.collection("records")
+        // 사용자 ID 가져오기
+        val userId = currentUserId
+
+        val recordCollection = firestore
+            .collection("records")
+            .document(userId)
+            .collection("private_records")
 
         // firestore에서 새로운 문서 ID 생성
         val newDoc = recordCollection.document()
@@ -53,6 +73,34 @@ class RecordRepositoryImpl @Inject constructor(
         val sharedCollection = firestore.collection("shared_records")
 
         // set()을 사용하여 개인 기록과 동일한 ID로 저장
-        sharedCollection.document(record.recordId).set(record).await()
+        record.recordId?.let { recordId ->
+            sharedCollection.document(recordId).set(record).await()
+        }
+    }
+
+    override suspend fun getUserRecord(): List<TripRecord> {
+        // 사용자 ID 가져오기
+        val userId = currentUserId
+
+        return withContext(Dispatchers.IO) {
+            try {
+                // querySnapshot 객체 가져오기 (사용자의 전체 문서)
+                val querySnapshot = firestore
+                    .collection("records")
+                    .document(userId)
+                    .collection("private_records")
+                    .orderBy("startDateMillis", Query.Direction.DESCENDING)
+                    .get()
+                    .await()
+
+                val entityList = querySnapshot.toObjects<RecordEntity>()
+                val domainList = entityList.map { RecordMapper.toDomain(it) }
+
+                return@withContext domainList
+            } catch (e: Exception) {
+                Log.e("record", "getUserRecord error", e)
+                return@withContext emptyList()
+            }
+        }
     }
 }

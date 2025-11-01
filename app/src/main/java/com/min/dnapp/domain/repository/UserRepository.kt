@@ -1,0 +1,7 @@
+package com.min.dnapp.domain.repository
+
+import com.min.dnapp.data.remote.dto.UserEntity
+
+interface UserRepository {
+    suspend fun getUserData(uid: String): UserEntity
+}

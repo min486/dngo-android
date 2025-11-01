@@ -1,37 +1,47 @@
 package com.min.dnapp.data.mapper
 
-import com.min.dnapp.data.remote.dto.PlaceEntity
 import com.min.dnapp.data.remote.dto.RecordEntity
-import com.min.dnapp.domain.model.LocalPlace
+import com.min.dnapp.domain.model.TripRecord
 import com.min.dnapp.presentation.write.RecordWriteUiState
 
-/**
- * RecordWriteUiState -> RecordEntity 변환
- */
-fun RecordWriteUiState.toEntity(userId: String, imageUrl: String?): RecordEntity {
-    return RecordEntity(
-        userId = userId,
-        title = this.recordTitle,
-        content = this.recordContent,
-        startDateMillis = this.selectedStartDateMillis,
-        endDateMillis = this.selectedEndDateMillis,
-        emotionKey = this.selectedEmotion?.key,
-        weatherKey = this.selectedWeather?.key,
-        selectedPlace = this.selectedPlace?.toEntity(),
-        overseasPlace = this.overseasPlace,
-        isShareChecked = this.isShareChecked,
-        // 업로드 후 받은 URL
-        imageUrl = imageUrl
-    )
-}
+object RecordMapper {
+    /**
+     * RecordWriteUiState -> RecordEntity 변환
+     */
+    fun toEntity(uiState: RecordWriteUiState, imageUrl: String?): RecordEntity {
+        return RecordEntity(
+            title = uiState.recordTitle,
+            content = uiState.recordContent,
+            startDateMillis = uiState.selectedStartDateMillis,
+            endDateMillis = uiState.selectedEndDateMillis,
+            emotionKey = uiState.selectedEmotion?.key,
+            weatherKey = uiState.selectedWeather?.key,
+            selectedPlace = uiState.selectedPlace?.toEntity(),
+            overseasPlace = uiState.overseasPlace,
+            isShareChecked = uiState.isShareChecked,
+            // 업로드 후 받은 URL
+            imageUrl = imageUrl
+        )
+    }
 
-/**
- * LocalPlace -> PlaceEntity 변환
- */
-fun LocalPlace.toEntity(): PlaceEntity {
-    return PlaceEntity(
-        title = this.title,
-        category = this.category,
-        roadAddress = this.roadAddress
-    )
+    /**
+     * Entity -> Domain 변환
+     */
+    fun toDomain(entity: RecordEntity): TripRecord {
+        return TripRecord(
+            recordId = entity.recordId ?: "",
+            userId = entity.userId ?: "",
+            title = entity.title ?: "",
+            content = entity.content ?: "",
+            startDateMillis = entity.startDateMillis ?: 0L,
+            endDateMillis = entity.endDateMillis ?: 0L,
+            emotionKey = entity.emotionKey ?: "",
+            weatherKey = entity.weatherKey ?: "",
+            selectedPlace = entity.selectedPlace?.toDomain(),
+            overseasPlace = entity.overseasPlace ?: "",
+            isShareChecked = entity.isShareChecked ?: false,
+            imageUrl = entity.imageUrl ?: "",
+            createdAt = entity.createdAt?.toDate()?.time ?: 0L
+        )
+    }
 }

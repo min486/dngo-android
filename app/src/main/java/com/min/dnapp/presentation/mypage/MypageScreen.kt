@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.mypage.component.ProfileImageDialog
+import com.min.dnapp.presentation.ui.component.UserBadge
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Bell
 import com.min.dnapp.presentation.ui.icon.appicons.PenSmall
@@ -130,7 +131,7 @@ fun MypageProfileSection(onClick: () -> Unit) {
         Spacer(Modifier.height(12.dp))
 
         // 뱃지
-        UserBadge()
+//        UserBadge()
 
         Spacer(Modifier.height(16.dp))
 
@@ -180,27 +181,6 @@ fun UserProfileImage(onClick: () -> Unit) {
                 tint = MomentoTheme.colors.grayW60
             )
         }
-    }
-}
-
-@Composable
-fun UserBadge() {
-    Row(
-        modifier = Modifier
-            .background(color = MomentoTheme.colors.white, shape = RoundedCornerShape(20.dp))
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(R.drawable.badge_new),
-            contentDescription = null
-        )
-        Spacer(Modifier.width(4.dp))
-        Text(
-            text = "새내기",
-            style = MomentoTheme.typography.caption,
-            color = MomentoTheme.colors.grayW20
-        )
     }
 }
 
