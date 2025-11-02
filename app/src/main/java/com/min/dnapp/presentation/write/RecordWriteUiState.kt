@@ -24,5 +24,5 @@ data class RecordWriteUiState(
     val selectedPlace: LocalPlace? = null,
     val overseasPlace: String = "",
     val selectedImageUri: Uri? = null,
-    val isShareChecked: Boolean = false
+    val isShareChecked: Boolean = true
 )

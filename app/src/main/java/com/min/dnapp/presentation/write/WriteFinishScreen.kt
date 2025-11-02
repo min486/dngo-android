@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,12 +30,18 @@ import com.min.dnapp.R
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 import com.min.dnapp.presentation.write.component.WriteStampDialog
+import kotlinx.coroutines.delay
 
 @Composable
 fun WriteFinishScreen(
     navController: NavHostController
 ) {
-    var showStampDialog by remember { mutableStateOf(true) }
+    var showStampDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(1000)
+        showStampDialog = true
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -70,7 +77,10 @@ fun WriteFinishScreen(
                 Box(
                     modifier = Modifier
                         .clickable {
-                            navController.navigate("home")
+                            navController.navigate("home") {
+                                // 스택 모두 제거
+                                popUpTo(navController.graph.id) { inclusive = true }
+                            }
                         }
                         .fillMaxWidth()
                         .background(color = MomentoTheme.colors.brownBase, shape = RoundedCornerShape(10.dp))

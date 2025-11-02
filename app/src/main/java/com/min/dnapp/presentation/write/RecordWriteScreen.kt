@@ -1,8 +1,7 @@
 package com.min.dnapp.presentation.write
 
-import   android.content.Intent
+import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
@@ -36,6 +36,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -66,6 +69,7 @@ import com.min.dnapp.R
 import com.min.dnapp.domain.model.EmotionType
 import com.min.dnapp.domain.model.LocalPlace
 import com.min.dnapp.domain.model.WeatherType
+import com.min.dnapp.presentation.ui.component.CustomSnackbar
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Back
 import com.min.dnapp.presentation.ui.icon.appicons.Calendar
@@ -74,6 +78,7 @@ import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 import com.min.dnapp.presentation.write.component.EmotionBottomSheetContent
 import com.min.dnapp.presentation.write.component.PlaceBottomSheetContent
+import com.min.dnapp.presentation.write.component.ShareGuide
 import com.min.dnapp.presentation.write.component.WeatherBottomSheetContent
 import com.min.dnapp.util.toLocalDate
 
@@ -85,6 +90,11 @@ fun RecordWriteScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 공유 안내 말풍선 표시상태
+    var isShareGuideVisible by remember { mutableStateOf(true) }
 
     // 캘린더 모달 표시상태
     var showDatePicker by remember { mutableStateOf(false) }
@@ -140,6 +150,16 @@ fun RecordWriteScreen(
         }
     }
 
+    // 메시지 발행을 수집하여 스낵바 표시
+    LaunchedEffect(Unit) {
+        viewModel.snackbarMessage.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message.message,
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
         topBar = {
@@ -178,14 +198,33 @@ fun RecordWriteScreen(
             )
         },
         bottomBar = {
-            // 이미지 아이콘 & 공유여부 스위치 영역
-            ImageAndShareSection(
-                isChecked = uiState.isShareChecked,
-                onCheckedChange = { newChecked ->
-                    viewModel.updateShare(newChecked)
-                },
-                onGalleryClick = { viewModel.onGalleryIconClicked() }
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.End
+            ) {
+                // 공유 안내 말풍선
+                if (isShareGuideVisible) {
+                    ShareGuide(
+                        onClick = { isShareGuideVisible = false }
+                    )
+                }
+
+                // 이미지 아이콘 & 공유여부 스위치 영역
+                ImageAndShareSection(
+                    isChecked = uiState.isShareChecked,
+                    onCheckedChange = { newChecked ->
+                        viewModel.updateShare(newChecked)
+                    },
+                    onGalleryClick = { viewModel.onGalleryIconClicked() }
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                CustomSnackbar(
+                    snackbarData = data
+                )
+            }
         }
     ) { paddingValues ->
         Column(
@@ -252,6 +291,22 @@ fun RecordWriteScreen(
                     }
                 )
             }
+        }
+    }
+
+    // 기록 등록 진행 시 로딩 인디케이터 표시
+    if (uiState.isSaving) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MomentoTheme.colors.black.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(40.dp),
+                color = MomentoTheme.colors.white,
+                strokeWidth = 4.dp
+            )
         }
     }
 
@@ -706,7 +761,7 @@ fun WriteContentSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(310.dp)
+                .height(300.dp)
                 .background(color = MomentoTheme.colors.brownBg)
                 .padding(16.dp)
         ) {

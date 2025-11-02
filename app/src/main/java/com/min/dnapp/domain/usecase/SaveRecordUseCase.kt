@@ -38,6 +38,9 @@ class SaveRecordUseCase @Inject constructor(
                 recordRepository.saveSharedRecord(savedRecord)
             }
 
+            // 기록/스탬프 수 1씩 증가
+            recordRepository.increaseRecordAndStamp()
+
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
