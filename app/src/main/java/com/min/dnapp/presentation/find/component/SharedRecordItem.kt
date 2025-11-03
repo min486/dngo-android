@@ -61,6 +61,8 @@ fun SharedRecordItem(
                 content = record.content,
                 startDateMillis = record.startDateMillis,
                 endDateMillis = if (record.endDateMillis == 0L) null else record.endDateMillis,
+                weatherName = record.weatherKey,
+                emotionName = record.emotionKey,
                 placeName = record.selectedPlace?.title,
                 imageUrl = if (record.imageUrl.isEmpty()) null else record.imageUrl
             )

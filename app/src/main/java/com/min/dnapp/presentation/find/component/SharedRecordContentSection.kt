@@ -21,6 +21,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.min.dnapp.R
+import com.min.dnapp.presentation.common.EmotionMapper
+import com.min.dnapp.presentation.common.WeatherMapper
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 import com.min.dnapp.util.toDateString
 
@@ -30,6 +32,8 @@ fun SharedRecordContentSection(
     content: String,
     startDateMillis: Long,
     endDateMillis: Long?,
+    weatherName: String,
+    emotionName: String,
     placeName: String?,
     imageUrl: String?
 ) {
@@ -38,6 +42,10 @@ fun SharedRecordContentSection(
 
     // 여행 날짜 텍스트 계산
     val dateText = endDate?.let { "$startDate ~ $it" } ?: startDate
+
+    // 날씨 & 감정 이미지 리소스로 변환
+    val weatherImageResId = WeatherMapper.getWeatherImageResId(weatherName)
+    val emotionImageResId = EmotionMapper.getEmotionImageResId(emotionName)
 
     Column(
         modifier = Modifier
@@ -78,13 +86,13 @@ fun SharedRecordContentSection(
             ) {
                 Image(
                     modifier = Modifier.size(28.dp),
-                    painter = painterResource(R.drawable.weather_sun),
+                    painter = painterResource(weatherImageResId),
                     contentDescription = null
                 )
                 Spacer(Modifier.width(4.dp))
                 Image(
                     modifier = Modifier.size(28.dp),
-                    painter = painterResource(R.drawable.emotion_feel),
+                    painter = painterResource(emotionImageResId),
                     contentDescription = null
                 )
             }
