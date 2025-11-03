@@ -25,6 +25,10 @@ class LoginViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    // 회원탈퇴 완료 모달창 상태
+    private val _showUserRemoveSuccessDialog = MutableStateFlow(false)
+    val showUserRemoveSuccessDialog: StateFlow<Boolean> = _showUserRemoveSuccessDialog.asStateFlow()
+
     /**
      * 카카오 로그인
      */
@@ -81,14 +85,21 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
+     * 회원탈퇴 완료 모달창 열기
+     */
+    fun openDialog() {
+        _showUserRemoveSuccessDialog.value = true
+    }
+
+    /**
      * 회원탈퇴 처리
      * - firebase auth 사용자 삭제
      * - firestore "users" 문서 삭제
      * - 카카오 연결 끊기
      */
     fun onUnlinkClicked(
-        onSuccess: () -> Unit,
-        onFailure: (Throwable) -> Unit
+//        onSuccess: () -> Unit,
+//        onFailure: (Throwable) -> Unit
     ) {
         viewModelScope.launch {
             try {
@@ -96,13 +107,15 @@ class LoginViewModel @Inject constructor(
                 Log.d("auth", "onUnlinkClicked - result : $result")
 
                 result.onSuccess {
-                    onSuccess()
+//                    onSuccess()
+                    openDialog()
                 }.onFailure { exception ->
-                    onFailure(exception)
+//                    onFailure(exception)
+                    Log.e("auth", "회원탈퇴 처리 실패", exception)
                 }
             } catch (e: Exception) {
                 Log.e("auth", "onUnlinkClicked - unexpected error", e)
-                onFailure(e)
+//                onFailure(e)
             }
         }
     }

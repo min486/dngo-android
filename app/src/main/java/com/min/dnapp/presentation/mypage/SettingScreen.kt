@@ -15,12 +15,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.min.dnapp.presentation.login.LoginViewModel
+import com.min.dnapp.presentation.mypage.component.UserRemoveDialog
+import com.min.dnapp.presentation.mypage.component.UserRemoveSuccessDialog
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Back
 import com.min.dnapp.presentation.ui.theme.DngoTheme
@@ -30,8 +37,12 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 @Composable
 fun SettingScreen(
     navController: NavHostController,
-    viewModel: LoginViewModel = hiltViewModel()
+    loginViewModel: LoginViewModel = hiltViewModel()
 ) {
+    val showUserRemoveSuccessDialog by loginViewModel.showUserRemoveSuccessDialog.collectAsStateWithLifecycle()
+
+    var showUserRemoveDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         containerColor = MomentoTheme.colors.brownBg,
         topBar = {
@@ -70,7 +81,7 @@ fun SettingScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        viewModel.onLogoutClicked(
+                        loginViewModel.onLogoutClicked(
                             onSuccess = {
                                 // 로그아웃 성공 후 이동
                                 navController.navigate("login") {
@@ -78,9 +89,7 @@ fun SettingScreen(
                                     popUpTo(navController.graph.id) { inclusive = true }
                                 }
                             },
-                            onFailure = {
-
-                            }
+                            onFailure = {}
                         )
                     }
             ) {
@@ -96,28 +105,43 @@ fun SettingScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
-                        viewModel.onUnlinkClicked(
-                            onSuccess = {
-                                // 회원탈퇴 성공 후 이동
-                                navController.navigate("login") {
-                                    // 최상위 그래프의 ID까지 스택 모두 제거
-                                    popUpTo(navController.graph.id) { inclusive = true }
-                                }
-                            },
-                            onFailure = {
-
-                            }
-                        )
-                    }
+                    .clickable { showUserRemoveDialog = true }
             ) {
                 Text(
-                    text = "계정 탈퇴",
+                    text = "탈퇴하기",
                     style = MomentoTheme.typography.body01,
                     color = MomentoTheme.colors.grayW20
                 )
             }
         }
+    }
+
+    // 회원탈퇴 확인 모달창
+    if (showUserRemoveDialog) {
+        UserRemoveDialog(
+            onDismiss = { showUserRemoveDialog = false },
+            onCancel = { showUserRemoveDialog = false },
+            onConfirm = {
+                showUserRemoveDialog = false
+                loginViewModel.onUnlinkClicked()
+            }
+        )
+    }
+
+    // 회원탈퇴 완료 모달창
+    if (showUserRemoveSuccessDialog) {
+        UserRemoveSuccessDialog(
+            onDismiss = {
+                navController.navigate("login") {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                }
+            },
+            onConfirm = {
+                navController.navigate("login") {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                }
+            }
+        )
     }
 }
 
