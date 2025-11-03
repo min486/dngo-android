@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -132,7 +133,10 @@ fun SharedRecordContentSection(
         // 여행 이미지
         imageUrl?.let { image ->
             AsyncImage(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    // 가로:세로 비율 1:1
+                    .aspectRatio(1f),
                 model = image,
                 contentDescription = null,
                 contentScale = ContentScale.Crop

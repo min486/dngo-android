@@ -14,13 +14,18 @@ import androidx.compose.ui.unit.dp
 import com.min.dnapp.R
 import com.min.dnapp.presentation.common.BadgeMapper
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
+import com.min.dnapp.util.toTimeAgoString
 
 @Composable
 fun SharedRecordTimeSection(
     nickname: String,
-    badgeLv: Int
+    badgeLv: Int,
+    createdAtMillis: Long
 ) {
     val imageResId = BadgeMapper.getBadgeImageResId(badgeLv)
+
+    // 경과 시간 텍스트 (현재 시간 기준으로 공유된 시간 계산)
+    val timeAgoText = createdAtMillis.toTimeAgoString()
 
     Row(
         verticalAlignment = Alignment.CenterVertically
@@ -38,7 +43,7 @@ fun SharedRecordTimeSection(
         )
         Spacer(Modifier.width(4.dp))
         Text(
-            text = "2분 전",
+            text = timeAgoText,
             style = MomentoTheme.typography.body02,
             color = MomentoTheme.colors.grayW20
         )

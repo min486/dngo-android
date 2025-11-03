@@ -137,6 +137,7 @@ class RecordRepositoryImpl @Inject constructor(
             try {
                 val querySnapshot = firestore
                     .collection("shared_records")
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
                     .get()
                     .await()
 

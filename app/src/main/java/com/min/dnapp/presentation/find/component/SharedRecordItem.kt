@@ -42,7 +42,8 @@ fun SharedRecordItem(
             // 공유 경과시간 영역
             SharedRecordTimeSection(
                 nickname = record.userData?.nickname ?: "",
-                badgeLv = record.userData?.badgeLv ?: 1
+                badgeLv = record.userData?.badgeLv ?: 1,
+                createdAtMillis = record.createdAt
             )
 
             Spacer(Modifier.height(8.dp))
