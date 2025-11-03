@@ -129,6 +129,9 @@ fun MypageScreen(
                     Spacer(Modifier.height(20.dp))
 
                     MypageMenuSection(
+                        onRecordClick = {
+                            navController.navigate("my_record")
+                        },
                         onSettingClick = {
                             navController.navigate("setting")
                         }
@@ -338,6 +341,7 @@ fun RecordAndStampNum(
 
 @Composable
 fun MypageMenuSection(
+    onRecordClick: () -> Unit,
     onSettingClick: () -> Unit
 ) {
     Column(
@@ -347,7 +351,7 @@ fun MypageMenuSection(
     ) {
         MypageMenuItem(
             text = "내 기록 모아보기",
-            onClick = {}
+            onClick = { onRecordClick() }
         )
         Spacer(Modifier.height(28.dp))
         MypageMenuItem(
