@@ -27,9 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -56,9 +53,8 @@ fun MypageScreen(
     mypageViewModel: MypageViewModel = hiltViewModel()
 ) {
     val uiState by mypageViewModel.uiState.collectAsStateWithLifecycle()
+    val showImageUpdateDialog by mypageViewModel.showImageUpdateDialog.collectAsStateWithLifecycle()
     val selectedImage by mypageViewModel.selectedImage.collectAsStateWithLifecycle()
-
-    var showProfileImageDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
@@ -123,7 +119,7 @@ fun MypageScreen(
                         nickname = data.user.nickname,
                         recordCnt = data.user.recordCnt,
                         stampCnt = data.user.stampCnt,
-                        onClick = { showProfileImageDialog = true }
+                        onClick = { mypageViewModel.openDialog() }
                     )
 
                     Spacer(Modifier.height(20.dp))
@@ -142,15 +138,15 @@ fun MypageScreen(
         }
     }
 
-    // 프로필이미지 수정 모달창
-    if (showProfileImageDialog) {
+    // 프로필 이미지 변경 모달창
+    if (showImageUpdateDialog) {
         ProfileImageDialog(
             selectedImage = selectedImage,
             onImageClick = { profileImageType ->
                 mypageViewModel.selectImage(profileImageType)
             },
-            onDismiss = { showProfileImageDialog = false },
-            onConfirm = {}
+            onDismiss = { mypageViewModel.closeDialog() },
+            onConfirm = { mypageViewModel.updateProfileImage() }
         )
     }
 }
