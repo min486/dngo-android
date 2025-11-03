@@ -1,7 +1,6 @@
 package com.min.dnapp.presentation.mypage.component
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,25 +11,30 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.min.dnapp.R
+import com.min.dnapp.presentation.mypage.ProfileImageType
+import com.min.dnapp.presentation.ui.component.SelectButton
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @Composable
 fun ProfileImageDialog(
+    selectedImage: ProfileImageType?,
+    onImageClick: (ProfileImageType) -> Unit,
     onDismiss: () -> Unit,
-    onCancel: () -> Unit,
     onConfirm: () -> Unit
 ) {
+    // 프로필 이미지 목록 (8개)
+    val allImages = ProfileImageType.entries.toList()
+
     Dialog(
         onDismissRequest = onDismiss
     ) {
@@ -53,111 +57,57 @@ fun ProfileImageDialog(
 
                 Spacer(Modifier.height(20.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.logo_profile),
-                        contentDescription = null
-                    )
-                    Spacer(Modifier.width(20.dp))
-                    Image(
-                        painter = painterResource(R.drawable.logo_profile2),
-                        contentDescription = null
-                    )
-                }
-                Spacer(Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.logo_profile3),
-                        contentDescription = null
-                    )
-                    Spacer(Modifier.width(20.dp))
-                    Image(
-                        painter = painterResource(R.drawable.logo_profile4),
-                        contentDescription = null
-                    )
-                }
-                Spacer(Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.logo_profile5),
-                        contentDescription = null
-                    )
-                    Spacer(Modifier.width(20.dp))
-                    Box(
-                        modifier = Modifier
-                            .border(width = 3.dp, color = MomentoTheme.colors.pinkBase, shape = RoundedCornerShape(10.dp))
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.logo_profile6),
-                            contentDescription = null
-                        )
+                for (idx in 0 until allImages.size step 2) {
+
+                    // 처음 Row가 아니면, Row 위에 간격 추가
+                    if (idx > 0) {
+                        Spacer(Modifier.height(16.dp))
                     }
 
-                }
-                Spacer(Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.logo_profile7),
-                        contentDescription = null
-                    )
-                    Spacer(Modifier.width(20.dp))
-                    Image(
-                        painter = painterResource(R.drawable.logo_profile8),
-                        contentDescription = null
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        ProfileImageItem(
+                            profileImageType = allImages[idx],
+                            isSelected = selectedImage == allImages[idx],
+                            onClick = onImageClick
+                        )
+                        ProfileImageItem(
+                            profileImageType = allImages[idx+1],
+                            isSelected = selectedImage == allImages[idx+1],
+                            onClick = onImageClick
+                        )
+                    }
                 }
 
                 Spacer(Modifier.height(24.dp))
 
-                // 취소/확인 버튼 영역
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .clickable { onCancel() }
-                            .weight(1f)
-                            .background(color = MomentoTheme.colors.grayW80, shape = RoundedCornerShape(10.dp))
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "취소",
-                            style = MomentoTheme.typography.body01,
-                            color = MomentoTheme.colors.white
-                        )
-                    }
-
-                    Spacer(Modifier.width(8.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .clickable { onConfirm() }
-                            .weight(1f)
-                            .background(color = MomentoTheme.colors.brownBase, shape = RoundedCornerShape(10.dp))
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "확인",
-                            style = MomentoTheme.typography.body01,
-                            color = MomentoTheme.colors.white
-                        )
-                    }
-                }
+                // 확인 버튼
+                SelectButton(
+                    enabled = selectedImage != null,
+                    onConfirm = onConfirm
+                )
             }
         }
+    }
+}
+
+@Composable
+fun ProfileImageItem(
+    profileImageType: ProfileImageType,
+    isSelected: Boolean,
+    onClick: (ProfileImageType) -> Unit
+) {
+    val borderColor = if (isSelected) MomentoTheme.colors.pinkBase else Color.Transparent
+
+    Box(
+        modifier = Modifier
+            .clickable { onClick(profileImageType) }
+            .border(width = 3.dp, color = borderColor, shape = RoundedCornerShape(10.dp))
+    ) {
+        Image(
+            painter = painterResource(profileImageType.resId),
+            contentDescription = null
+        )
     }
 }

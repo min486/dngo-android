@@ -56,6 +56,7 @@ fun MypageScreen(
     mypageViewModel: MypageViewModel = hiltViewModel()
 ) {
     val uiState by mypageViewModel.uiState.collectAsStateWithLifecycle()
+    val selectedImage by mypageViewModel.selectedImage.collectAsStateWithLifecycle()
 
     var showProfileImageDialog by remember { mutableStateOf(false) }
 
@@ -144,8 +145,11 @@ fun MypageScreen(
     // 프로필이미지 수정 모달창
     if (showProfileImageDialog) {
         ProfileImageDialog(
+            selectedImage = selectedImage,
+            onImageClick = { profileImageType ->
+                mypageViewModel.selectImage(profileImageType)
+            },
             onDismiss = { showProfileImageDialog = false },
-            onCancel = { showProfileImageDialog = false },
             onConfirm = {}
         )
     }

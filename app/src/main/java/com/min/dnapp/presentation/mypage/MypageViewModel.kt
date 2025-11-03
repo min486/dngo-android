@@ -21,6 +21,10 @@ class MypageViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<MypageUiState>(MypageUiState.Loading)
     val uiState: StateFlow<MypageUiState> = _uiState.asStateFlow()
 
+    // 현재 선택된 프로필 이미지
+    private val _selectedImage = MutableStateFlow<ProfileImageType?>(null)
+    val selectedImage: StateFlow<ProfileImageType?> = _selectedImage.asStateFlow()
+
     init {
         loadMyData()
     }
@@ -50,5 +54,11 @@ class MypageViewModel @Inject constructor(
                 Log.e("my", "사용자 정보 조회 실패", e)
             }
         }
+    }
+
+    // 프로필 이미지 선택
+    fun selectImage(image: ProfileImageType) {
+        // 선택된 이미지 다시 선택하면 해제
+        _selectedImage.value = if (_selectedImage.value == image) null else image
     }
 }
