@@ -30,7 +30,10 @@ class RecordRepositoryImpl @Inject constructor(
     /**
      * Storage에 이미지 업로드 및 URL 반환
      */
-    override suspend fun uploadImageAndGetUrl(imageUri: Uri, userId: String): String {
+    override suspend fun uploadImageAndGetUrl(imageUri: Uri): String {
+        // 사용자 ID 가져오기
+        val userId = currentUserId
+
         // firebase storage 경로는 사용자별로 분리
         val storageRef = storage.reference
             .child("images")
@@ -58,8 +61,11 @@ class RecordRepositoryImpl @Inject constructor(
         val newDoc = recordCollection.document()
         val recordId = newDoc.id
 
-        // RecordEntity의 recordId 필드 채우기
-        val recordWithId = record.copy(recordId = recordId)
+        // RecordEntity의 ID 관련 필드 채우기
+        val recordWithId = record.copy(
+            recordId = recordId,
+            userId = userId
+        )
 
         // set()을 사용하여 해당 ID로 저장
         newDoc.set(recordWithId).await()
@@ -71,11 +77,16 @@ class RecordRepositoryImpl @Inject constructor(
      * 전체공유 컬렉션에 저장
      */
     override suspend fun saveSharedRecord(record: RecordEntity) {
+        // 사용자 ID 가져오기
+        val userId = currentUserId
+
         val sharedCollection = firestore.collection("shared_records")
 
+        val recordWithId = record.copy(userId = userId)
+
         // set()을 사용하여 개인 기록과 동일한 ID로 저장
-        record.recordId?.let { recordId ->
-            sharedCollection.document(recordId).set(record).await()
+        recordWithId.recordId?.let { recordId ->
+            sharedCollection.document(recordId).set(recordWithId).await()
         }
     }
 
@@ -95,7 +106,7 @@ class RecordRepositoryImpl @Inject constructor(
                     .await()
 
                 val entityList = querySnapshot.toObjects<RecordEntity>()
-                val domainList = entityList.map { RecordMapper.toDomain(it) }
+                val domainList = entityList.map { RecordMapper.fromEntity(it) }
 
                 return@withContext domainList
             } catch (e: Exception) {
@@ -119,5 +130,25 @@ class RecordRepositoryImpl @Inject constructor(
         )
 
         userDoc.update(updateCnt).await()
+    }
+
+    override suspend fun getSharedRecord(): List<TripRecord> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val querySnapshot = firestore
+                    .collection("shared_records")
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+                    .get()
+                    .await()
+
+                val entityList = querySnapshot.toObjects<RecordEntity>()
+                val domainList = entityList.map { RecordMapper.fromEntity(it) }
+
+                return@withContext domainList
+            } catch (e: Exception) {
+                Log.e("record", "getSharedRecord error", e)
+                return@withContext emptyList()
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ data class RecordEntity(
     var recordId: String? = null,
 
     val userId: String? = null,
+    val userData: UserDataEntity? = null,
 
     val title: String? = null,
     val content: String? = null,
@@ -36,4 +37,10 @@ data class PlaceEntity(
     val title: String? = null,
     val category: String? = null,
     val roadAddress: String? = null
+)
+
+data class UserDataEntity(
+    val badgeLv: Int? = 1,
+    val nickname: String? = null,
+    val profileImageName: String? = "01_boat",
 )

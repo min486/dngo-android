@@ -85,7 +85,7 @@ fun FindDetailScreen(navController: NavHostController) {
                         .padding(20.dp)
                 ) {
                     // 프로필 이미지
-                    ProfileImageCircle(modifier = Modifier.size(36.dp))
+//                    ProfileImageCircle(modifier = Modifier.size(36.dp))
 
                     Spacer(Modifier.width(8.dp))
 
@@ -106,7 +106,7 @@ fun FindDetailScreen(navController: NavHostController) {
                         Spacer(Modifier.height(8.dp))
 
                         // 기록 내용
-                        SharedRecordContentSection()
+//                        SharedRecordContentSection()
                     }
                 }
             }
@@ -138,7 +138,7 @@ fun SharedRecordMoreSection() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        SharedRecordTimeSection()
+//        SharedRecordTimeSection()
 
         Icon(
             modifier = Modifier
@@ -259,7 +259,7 @@ fun CommentItem() {
             .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
         // 프로필 이미지
-        ProfileImageCircle(modifier = Modifier.size(24.dp))
+//        ProfileImageCircle(modifier = Modifier.size(24.dp))
 
         Spacer(Modifier.width(8.dp))
 

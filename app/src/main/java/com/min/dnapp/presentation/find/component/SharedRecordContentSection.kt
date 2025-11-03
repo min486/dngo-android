@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,11 +20,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.min.dnapp.R
+import com.min.dnapp.presentation.common.EmotionMapper
+import com.min.dnapp.presentation.common.WeatherMapper
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
+import com.min.dnapp.util.toDateString
 
 @Composable
-fun SharedRecordContentSection() {
+fun SharedRecordContentSection(
+    title: String,
+    content: String,
+    startDateMillis: Long,
+    endDateMillis: Long?,
+    weatherName: String,
+    emotionName: String,
+    placeName: String?,
+    imageUrl: String?
+) {
+    val startDate = startDateMillis.toDateString("yy.MM.dd")
+    val endDate = endDateMillis?.toDateString("yy.MM.dd")
+
+    // 여행 날짜 텍스트 계산
+    val dateText = endDate?.let { "$startDate ~ $it" } ?: startDate
+
+    // 날씨 & 감정 이미지 리소스로 변환
+    val weatherImageResId = WeatherMapper.getWeatherImageResId(weatherName)
+    val emotionImageResId = EmotionMapper.getEmotionImageResId(emotionName)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -32,8 +56,9 @@ fun SharedRecordContentSection() {
     ) {
         Spacer(Modifier.height(16.dp))
 
+        // 여행 제목
         Text(
-            text = "제주도 동쪽 투어!",
+            text = title,
             style = MomentoTheme.typography.label,
             color = MomentoTheme.colors.grayW20
         )
@@ -49,24 +74,26 @@ fun SharedRecordContentSection() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 여행 날짜
             Text(
-                text = "25.08.20 ~ 25.08.22",
+                text = dateText,
                 style = MomentoTheme.typography.body03,
                 color = MomentoTheme.colors.grayW20
             )
 
+            // 날씨 & 감정
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
                     modifier = Modifier.size(28.dp),
-                    painter = painterResource(R.drawable.weather_sun),
+                    painter = painterResource(weatherImageResId),
                     contentDescription = null
                 )
                 Spacer(Modifier.width(4.dp))
                 Image(
                     modifier = Modifier.size(28.dp),
-                    painter = painterResource(R.drawable.emotion_feel),
+                    painter = painterResource(emotionImageResId),
                     contentDescription = null
                 )
             }
@@ -74,37 +101,47 @@ fun SharedRecordContentSection() {
 
         Spacer(Modifier.height(4.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(R.drawable.write_place),
-                contentDescription = null
-            )
-            Spacer(Modifier.width(6.dp))
-            Text(
-                text = "제주특별자치도",
-                style = MomentoTheme.typography.body03 ,
-                color = MomentoTheme.colors.grayW20
-            )
+        // 여행 장소
+        placeName?.let { place ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.write_place),
+                    contentDescription = null
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = place,
+                    style = MomentoTheme.typography.body03 ,
+                    color = MomentoTheme.colors.grayW20
+                )
+            }
         }
 
         Spacer(Modifier.height(6.dp))
 
+        // 여행 내용
         Text(
-            text = "비 오는 날 이호해수욕장... 너무 좋았어요",
-            style = MomentoTheme.typography.body02 ,
+            text = content,
+            style = MomentoTheme.typography.body02,
             color = MomentoTheme.colors.grayW20
         )
 
         Spacer(Modifier.height(6.dp))
 
-        Image(
-            modifier = Modifier.fillMaxWidth(),
-            painter = painterResource(R.drawable.beach ),
-            contentDescription = null,
-            contentScale = ContentScale.Crop
-        )
+        // 여행 이미지
+        imageUrl?.let { image ->
+            AsyncImage(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    // 가로:세로 비율 1:1
+                    .aspectRatio(1f),
+                model = image,
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+        }
 
         Spacer(Modifier.height(12.dp))
     }

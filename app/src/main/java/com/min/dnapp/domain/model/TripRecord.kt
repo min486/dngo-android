@@ -1,8 +1,9 @@
 package com.min.dnapp.domain.model
 
 data class TripRecord(
-    var recordId: String,
+//    var recordId: String,
     val userId: String,
+    val userData: UserData?,
     val title: String,
     val content: String,
     val startDateMillis: Long,
@@ -15,4 +16,10 @@ data class TripRecord(
     val isShareChecked: Boolean,
     val imageUrl: String,
     val createdAt: Long
+)
+
+data class UserData(
+    val badgeLv: Int,
+    val nickname: String,
+    val profileImageName: String,
 )
