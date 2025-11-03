@@ -26,10 +26,10 @@ fun Long?.toLocalDate(): LocalDate? {
  */
 fun Long.toDateString(format: String): String {
     val date = Date(this)
-    Log.d("home", "toDateString - date: $date")
+    Log.d("record", "toDateString - date: $date")
 
     val formatter = SimpleDateFormat(format, Locale.getDefault())
-    Log.d("home", "toDateString - formatter: $formatter")
+    Log.d("record", "toDateString - formatter: $formatter")
 
     return formatter.format(date)
 }

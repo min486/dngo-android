@@ -131,4 +131,23 @@ class RecordRepositoryImpl @Inject constructor(
 
         userDoc.update(updateCnt).await()
     }
+
+    override suspend fun getSharedRecord(): List<TripRecord> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val querySnapshot = firestore
+                    .collection("shared_records")
+                    .get()
+                    .await()
+
+                val entityList = querySnapshot.toObjects<RecordEntity>()
+                val domainList = entityList.map { RecordMapper.fromEntity(it) }
+
+                return@withContext domainList
+            } catch (e: Exception) {
+                Log.e("record", "getSharedRecord error", e)
+                return@withContext emptyList()
+            }
+        }
+    }
 }

@@ -11,7 +11,7 @@ object UserDataMapper {
     fun fromUser(user: User): UserData {
         return UserData(
             badgeLv = user.badgeLv,
-            nickname = user.badgeName,
+            nickname = user.nickname,
             profileImageName = user.profileImageName
         )
     }

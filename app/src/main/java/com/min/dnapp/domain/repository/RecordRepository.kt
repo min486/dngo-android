@@ -10,4 +10,5 @@ interface RecordRepository {
     suspend fun saveSharedRecord(record: RecordEntity)
     suspend fun getUserRecord(): List<TripRecord>
     suspend fun increaseRecordAndStamp()
+    suspend fun getSharedRecord(): List<TripRecord>
 }
