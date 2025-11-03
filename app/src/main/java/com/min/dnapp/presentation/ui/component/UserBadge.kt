@@ -14,13 +14,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.min.dnapp.presentation.common.BadgeMapper
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @Composable
 fun UserBadge(
-    badgeName: String,
-    badgeImageResId: Int
+    badgeLv: Int,
+    badgeName: String
 ) {
+    // badgeLv을 통해 매핑된 이미지 리소스 ID
+    val badgeImageResId = BadgeMapper.getBadgeImageResId(badgeLv)
+
     Row(
         modifier = Modifier
             .background(color = MomentoTheme.colors.white, shape = RoundedCornerShape(20.dp))
@@ -30,7 +34,7 @@ fun UserBadge(
         Image(
             modifier = Modifier.size(24.dp),
             painter = painterResource(badgeImageResId),
-            contentDescription = null,
+            contentDescription = null
         )
         Spacer(Modifier.width(4.dp))
         Text(

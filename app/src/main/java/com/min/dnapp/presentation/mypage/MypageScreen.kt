@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -26,17 +27,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.min.dnapp.R
+import com.min.dnapp.presentation.common.ProfileMapper
 import com.min.dnapp.presentation.mypage.component.ProfileImageDialog
 import com.min.dnapp.presentation.ui.component.UserBadge
 import com.min.dnapp.presentation.ui.icon.AppIcons
@@ -48,9 +49,12 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MypageScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    mypageViewModel: MypageViewModel = hiltViewModel()
 ) {
-    var showProfileImageDialog by remember { mutableStateOf(false) }
+    val uiState by mypageViewModel.uiState.collectAsStateWithLifecycle()
+    val showImageUpdateDialog by mypageViewModel.showImageUpdateDialog.collectAsStateWithLifecycle()
+    val selectedImage by mypageViewModel.selectedImage.collectAsStateWithLifecycle()
 
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
@@ -82,62 +86,107 @@ fun MypageScreen(
             )
         }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-        ) {
-            Spacer(Modifier.height(20.dp))
 
-            MypageProfileSection(
-                onClick = { showProfileImageDialog = true }
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            HorizontalDivider(thickness = 1.dp, color = MomentoTheme.colors.brownW60)
-
-            Spacer(Modifier.height(20.dp))
-
-            MypageMenuSection(
-                onSettingClick = {
-                    navController.navigate("setting")
+        when (uiState) {
+            is MypageUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(40.dp),
+                        color = MomentoTheme.colors.brownW20,
+                        strokeWidth = 4.dp
+                    )
                 }
-            )
+            }
+            is MypageUiState.Error -> {}
+            is MypageUiState.Success -> {
+                // Success 데이터 추출
+                val data = uiState as MypageUiState.Success
+
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                ) {
+                    Spacer(Modifier.height(20.dp))
+
+                    MypageProfileSection(
+                        profileImageName = data.user.profileImageName,
+                        badgeLv = data.user.badgeLv,
+                        badgeName = data.user.badgeName,
+                        nickname = data.user.nickname,
+                        recordCnt = data.user.recordCnt,
+                        stampCnt = data.user.stampCnt,
+                        onClick = { mypageViewModel.openDialog() }
+                    )
+
+                    Spacer(Modifier.height(20.dp))
+
+                    HorizontalDivider(thickness = 1.dp, color = MomentoTheme.colors.brownW60)
+
+                    Spacer(Modifier.height(20.dp))
+
+                    MypageMenuSection(
+                        onRecordClick = {
+                            navController.navigate("my_record")
+                        },
+                        onSettingClick = {
+                            navController.navigate("setting")
+                        }
+                    )
+                }
+            }
         }
     }
 
-    // 프로필이미지 수정 모달창
-    if (showProfileImageDialog) {
+    // 프로필 이미지 변경 모달창
+    if (showImageUpdateDialog) {
         ProfileImageDialog(
-            onDismiss = { showProfileImageDialog = false },
-            onCancel = { showProfileImageDialog = false },
-            onConfirm = {}
+            selectedImage = selectedImage,
+            onImageClick = { profileImageType ->
+                mypageViewModel.selectImage(profileImageType)
+            },
+            onDismiss = { mypageViewModel.closeDialog() },
+            onConfirm = { mypageViewModel.updateProfileImage() }
         )
     }
 }
 
 @Composable
-fun MypageProfileSection(onClick: () -> Unit) {
+fun MypageProfileSection(
+    profileImageName: String,
+    badgeLv: Int,
+    badgeName: String,
+    nickname: String,
+    recordCnt: Int,
+    stampCnt: Int,
+    onClick: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 프로필 이미지 (수정 가능)
         UserProfileImage(
+            profileImageName = profileImageName,
             onClick = { onClick() }
         )
 
         Spacer(Modifier.height(12.dp))
 
         // 뱃지
-//        UserBadge()
+        UserBadge(
+            badgeLv = badgeLv,
+            badgeName = badgeName
+        )
 
         Spacer(Modifier.height(16.dp))
 
         // 닉네임
         Text(
-            text = "성민",
+            text = nickname,
             style = MomentoTheme.typography.title01,
             color = MomentoTheme.colors.grayW20
         )
@@ -145,12 +194,20 @@ fun MypageProfileSection(onClick: () -> Unit) {
         Spacer(Modifier.height(28.dp))
 
         // 기록/스탬프 개수
-        RecordAndStampNum()
+        RecordAndStampNum(
+            recordCnt = recordCnt,
+            stampCnt = stampCnt
+        )
     }
 }
 
 @Composable
-fun UserProfileImage(onClick: () -> Unit) {
+fun UserProfileImage(
+    profileImageName: String,
+    onClick: () -> Unit
+) {
+    val profileImageResId = ProfileMapper.getProfileImageResId(profileImageName)
+
     Box(
         modifier = Modifier
             .clickable { onClick() }
@@ -162,7 +219,7 @@ fun UserProfileImage(onClick: () -> Unit) {
                 .border(width = 2.dp, color = MomentoTheme.colors.grayW80, shape = RoundedCornerShape(10.dp))
         ) {
             Image(
-                painter = painterResource(R.drawable.logo_profile),
+                painter = painterResource(profileImageResId),
                 contentDescription = null
             )
         }
@@ -185,7 +242,10 @@ fun UserProfileImage(onClick: () -> Unit) {
 }
 
 @Composable
-fun RecordAndStampNum() {
+fun RecordAndStampNum(
+    recordCnt: Int,
+    stampCnt: Int
+) {
     Row(
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -223,7 +283,7 @@ fun RecordAndStampNum() {
 
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = "10개",
+                    text = "${recordCnt}개",
                     style = MomentoTheme.typography.label,
                     color = MomentoTheme.colors.grayW20,
                     textAlign = TextAlign.End
@@ -267,7 +327,7 @@ fun RecordAndStampNum() {
 
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    text = "0개",
+                    text = "${stampCnt}개",
                     style = MomentoTheme.typography.label,
                     color = MomentoTheme.colors.grayW20,
                     textAlign = TextAlign.End
@@ -281,6 +341,7 @@ fun RecordAndStampNum() {
 
 @Composable
 fun MypageMenuSection(
+    onRecordClick: () -> Unit,
     onSettingClick: () -> Unit
 ) {
     Column(
@@ -290,7 +351,7 @@ fun MypageMenuSection(
     ) {
         MypageMenuItem(
             text = "내 기록 모아보기",
-            onClick = {}
+            onClick = { onRecordClick() }
         )
         Spacer(Modifier.height(28.dp))
         MypageMenuItem(

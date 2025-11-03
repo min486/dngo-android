@@ -7,7 +7,6 @@ import com.min.dnapp.domain.model.User
 import com.min.dnapp.domain.usecase.GetCurrentUserIdUseCase
 import com.min.dnapp.domain.usecase.GetUserDataUseCase
 import com.min.dnapp.domain.usecase.GetUserRecordUseCase
-import com.min.dnapp.presentation.common.BadgeMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -74,14 +73,12 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun mapUserToHomeUiState(user: User): HomeUiState.Success {
-        val imageResId = BadgeMapper.getBadgeImageResId(user.badgeLv)
-
         return HomeUiState.Success(
             nickname = user.nickname,
-            recordCnt = user.recordCnt,
-            stampCnt = user.stampCnt,
+            badgeLv = user.badgeLv,
             badgeName = user.badgeName,
-            badgeImageResId = imageResId
+            recordCnt = user.recordCnt,
+            stampCnt = user.stampCnt
         )
     }
 }

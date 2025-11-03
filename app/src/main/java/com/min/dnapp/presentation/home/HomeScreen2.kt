@@ -132,10 +132,10 @@ fun HomeScreen2(
 
                     HomeHeaderSection(
                         nickname = data.nickname,
-                        recordCnt = data.recordCnt,
-                        stampCnt = data.stampCnt,
+                        badgeLv = data.badgeLv,
                         badgeName = data.badgeName,
-                        badgeImageResId = data.badgeImageResId
+                        recordCnt = data.recordCnt,
+                        stampCnt = data.stampCnt
                     )
 
                     Spacer(Modifier.height(20.dp))
@@ -212,8 +212,9 @@ fun HomeHeaderSection(
     nickname: String,
     recordCnt: Int,
     stampCnt: Int,
+    badgeLv: Int,
     badgeName: String,
-    badgeImageResId: Int
+//    badgeImageResId: Int
 ) {
     Column(
         modifier = Modifier
@@ -221,8 +222,9 @@ fun HomeHeaderSection(
             .padding(horizontal =  20.dp)
     ) {
         UserBadge(
+            badgeLv = badgeLv,
             badgeName = badgeName,
-            badgeImageResId = badgeImageResId
+//            badgeImageResId = badgeImageResId
         )
 
         Spacer(Modifier.height(12.dp))
