@@ -19,6 +19,16 @@
 
 <br>
 
+<p align="center">
+  <img src="./README.assets/image.png" width="18%" alt="image"/>
+  <img src="./README.assets/image2.png" width="18%" alt="image2"/>
+  <img src="./README.assets/image3.png" width="18%" alt="image3"/>
+  <img src="./README.assets/image4.png" width="18%" alt="image4"/>
+  <img src="./README.assets/image5.png" width="18%" alt="image5"/>
+</p>
+
+<br>
+
 ## Android 앱 아키텍처 (MVVM + Clean Architecture)
 
 <img src="./README.assets/architecture.png" width="100%" alt="play"/>
