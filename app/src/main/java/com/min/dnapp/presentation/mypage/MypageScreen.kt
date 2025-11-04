@@ -67,8 +67,9 @@ fun MypageScreen(
                 navigationIcon = {
                     Image(
                         modifier = Modifier
-                            .clickable {  }
-                            .padding(16.dp),
+//                            .clickable {  }
+//                            .padding(16.dp),
+                            .padding(start = 16.dp),
                         painter = painterResource(R.drawable.logo_momento),
                         contentDescription = null
                     )
@@ -76,7 +77,7 @@ fun MypageScreen(
                 actions = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.navigate("bell") }
                             .padding(16.dp),
                         imageVector = AppIcons.Bell,
                         contentDescription = null,

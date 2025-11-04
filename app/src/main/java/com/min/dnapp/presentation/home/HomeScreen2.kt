@@ -76,8 +76,9 @@ fun HomeScreen2(
                 navigationIcon = {
                     Image(
                         modifier = Modifier
-                            .clickable {  }
-                            .padding(16.dp),
+//                            .clickable {  }
+//                            .padding(16.dp),
+                            .padding(start = 16.dp),
                         painter = painterResource(R.drawable.logo_momento),
                         contentDescription = null
                     )
@@ -161,7 +162,9 @@ fun HomeScreen2(
                                 color = MomentoTheme.colors.grayW20
                             )
                             Icon(
-                                modifier = Modifier.clickable {  },
+                                modifier = Modifier.clickable {
+                                    navController.navigate("my_record")
+                                },
                                 imageVector = AppIcons.ArrowRight,
                                 contentDescription = null,
                                 tint = MomentoTheme.colors.grayW20

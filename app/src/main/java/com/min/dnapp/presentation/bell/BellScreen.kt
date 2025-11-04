@@ -67,17 +67,17 @@ fun BellScreen(navController: NavHostController) {
         ) {
             HorizontalDivider(thickness = 1.dp, color = MomentoTheme.colors.grayW80)
 
-            BellCommentItem(
-                image = painterResource(R.drawable.trip),
-                nickname = "안녕하세요안녕하세요"
-            )
-
-            for (i in 0 until 3) {
-                BellCommentItem(
-                    image = painterResource(R.drawable.trip3),
-                    nickname = "박사과"
-                )
-            }
+//            BellCommentItem(
+//                image = painterResource(R.drawable.trip),
+//                nickname = "안녕하세요안녕하세요"
+//            )
+//
+//            for (i in 0 until 3) {
+//                BellCommentItem(
+//                    image = painterResource(R.drawable.trip3),
+//                    nickname = "박사과"
+//                )
+//            }
         }
     }
 }
