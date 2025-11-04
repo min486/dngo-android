@@ -19,12 +19,12 @@
 
 <br>
 
-<p align="center">
-  <img src="./README.assets/image.png" width="18%" alt="image"/>
-  <img src="./README.assets/image2.png" width="18%" alt="image2"/>
-  <img src="./README.assets/image3.png" width="18%" alt="image3"/>
-  <img src="./README.assets/image4.png" width="18%" alt="image4"/>
-  <img src="./README.assets/image5.png" width="18%" alt="image5"/>
+<p align="left" style="display: flex; justify-content: space-between;">
+  <img src="./README.assets/image.png" width="19%" alt="image"/>
+  <img src="./README.assets/image2.png" width="19%" alt="image2"/>
+  <img src="./README.assets/image3.png" width="19%" alt="image3"/>
+  <img src="./README.assets/image4.png" width="19%" alt="image4"/>
+  <img src="./README.assets/image5.png" width="19%" alt="image5"/>
 </p>
 
 <br>
