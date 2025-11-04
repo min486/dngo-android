@@ -3,12 +3,18 @@ package com.min.dnapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -37,7 +43,10 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
 
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
+
+        // 콘텐츠를 화면 끝까지 확장 (Insets 처리는 Composable에게 맡기기)
+        enableEdgeToEdge()
+
         setContent {
             DngoTheme {
                 MomentoApp()
@@ -63,6 +72,8 @@ fun MomentoApp(
     }
 
     Scaffold(
+        // Padding 중복을 막기 위해 모든 Insets 차단
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
                 MomentoBottomNav(
@@ -80,7 +91,8 @@ fun MomentoApp(
         NavHost(
             modifier = Modifier.padding(paddingValues),
             navController = navController,
-            startDestination = startDestination
+//            startDestination = startDestination
+            startDestination = "home"
         ) {
             composable("login") {
                 LoginScreen2(navController = navController)
