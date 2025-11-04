@@ -91,8 +91,7 @@ fun MomentoApp(
         NavHost(
             modifier = Modifier.padding(paddingValues),
             navController = navController,
-//            startDestination = startDestination
-            startDestination = "home"
+            startDestination = startDestination
         ) {
             composable("login") {
                 LoginScreen2(navController = navController)
