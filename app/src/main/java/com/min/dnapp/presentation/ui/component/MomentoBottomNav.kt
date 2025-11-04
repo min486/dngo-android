@@ -44,7 +44,7 @@ fun MomentoBottomNav(
 ) {
     val items = listOf(
         BottonNavItem(AppIcons.Home, R.drawable.ic_home, "Home", "home"),
-        BottonNavItem(AppIcons.Explore, R.drawable.ic_explore, "Explore", "explore"),
+        BottonNavItem(AppIcons.Explore, R.drawable.ic_explore, "Discover", "find"),
         BottonNavItem(AppIcons.My, R.drawable.ic_my, "My", "my")
     )
 

@@ -58,7 +58,7 @@ fun MomentoApp(
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     val showBottomBar = when (currentRoute) {
-        "login", "bell", "explore_detail", "record_write", "write_finish", "my_record", "setting" -> false
+        "login", "bell", "find_detail", "record_write", "write_finish", "my_record", "setting" -> false
         else -> true
     }
 
@@ -88,7 +88,7 @@ fun MomentoApp(
             composable("home") {
                 HomeScreen2(navController = navController)
             }
-            composable("explore") {
+            composable("find") {
                 FindScreen(navController = navController)
             }
             composable("my") {
@@ -97,7 +97,7 @@ fun MomentoApp(
             composable("bell") {
                 BellScreen(navController = navController)
             }
-            composable("explore_detail") {
+            composable("find_detail") {
                 FindDetailScreen(navController = navController)
             }
             composable("record_write") {
