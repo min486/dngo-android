@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -48,7 +49,10 @@ fun LoginScreen2(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            // 시스템바 영역 피하기 (status bar, navigation bar 모두 적용)
+            .systemBarsPadding()
+            .fillMaxSize(),
         color = MomentoTheme.colors.brownW80
     ) {
         Column(

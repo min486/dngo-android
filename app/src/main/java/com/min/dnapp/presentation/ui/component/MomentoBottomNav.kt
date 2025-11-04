@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -44,12 +45,15 @@ fun MomentoBottomNav(
 ) {
     val items = listOf(
         BottonNavItem(AppIcons.Home, R.drawable.ic_home, "Home", "home"),
-        BottonNavItem(AppIcons.Explore, R.drawable.ic_explore, "Explore", "explore"),
+        BottonNavItem(AppIcons.Explore, R.drawable.ic_explore, "Discover", "find"),
         BottonNavItem(AppIcons.My, R.drawable.ic_my, "My", "my")
     )
 
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            // bottomNav가 navigationBar 위에 올라가도록 padding 처리
+            .navigationBarsPadding()
     ) {
         HorizontalDivider(thickness = 1.dp, color = MomentoTheme.colors.grayW90)
 

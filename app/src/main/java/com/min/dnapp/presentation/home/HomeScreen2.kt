@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -66,6 +67,7 @@ fun HomeScreen2(
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = MomentoTheme.colors.brownW90,
         topBar = {
             CenterAlignedTopAppBar(
@@ -76,8 +78,9 @@ fun HomeScreen2(
                 navigationIcon = {
                     Image(
                         modifier = Modifier
-                            .clickable {  }
-                            .padding(16.dp),
+//                            .clickable {  }
+//                            .padding(16.dp),
+                            .padding(start = 16.dp),
                         painter = painterResource(R.drawable.logo_momento),
                         contentDescription = null
                     )
@@ -161,7 +164,9 @@ fun HomeScreen2(
                                 color = MomentoTheme.colors.grayW20
                             )
                             Icon(
-                                modifier = Modifier.clickable {  },
+                                modifier = Modifier.clickable {
+                                    navController.navigate("my_record")
+                                },
                                 imageVector = AppIcons.ArrowRight,
                                 contentDescription = null,
                                 tint = MomentoTheme.colors.grayW20

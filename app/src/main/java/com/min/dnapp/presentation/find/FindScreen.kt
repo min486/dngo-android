@@ -3,6 +3,7 @@ package com.min.dnapp.presentation.find
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -42,6 +43,7 @@ fun FindScreen(
     val uiState by findViewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = MomentoTheme.colors.brownBg,
         topBar = {
             CenterAlignedTopAppBar(
@@ -52,8 +54,9 @@ fun FindScreen(
                 navigationIcon = {
                     Image(
                         modifier = Modifier
-                            .clickable {  }
-                            .padding(16.dp),
+//                            .clickable {  }
+//                            .padding(16.dp),
+                            .padding(start = 16.dp),
                         painter = painterResource(R.drawable.logo_momento),
                         contentDescription = null
                     )
@@ -61,7 +64,7 @@ fun FindScreen(
                 actions = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.navigate("bell") }
                             .padding(16.dp),
                         imageVector = AppIcons.Bell,
                         contentDescription = null,

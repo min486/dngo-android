@@ -59,7 +59,8 @@ fun SharedRecordContentSection(
         // 여행 제목
         Text(
             text = title,
-            style = MomentoTheme.typography.label,
+//            style = MomentoTheme.typography.label,
+            style = MomentoTheme.typography.body02,
             color = MomentoTheme.colors.grayW20
         )
 
