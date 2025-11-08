@@ -382,8 +382,12 @@ fun TimelineSection(
             }
 
             TimelineItem(
-                record = record,
-                isYearStart = isYearStart
+                isYearStart = isYearStart,
+                startDateMillis = record.startDateMillis,
+                endDateMillis = if (record.endDateMillis == 0L) null else record.endDateMillis,
+                imageUrl = if (record.imageUrl.isEmpty()) null else record.imageUrl,
+                title = record.title,
+                placeName = record.selectedPlace?.title
             )
         }
 
@@ -414,12 +418,19 @@ fun YearHeader(
 
 @Composable
 fun TimelineItem(
-    record: TripRecord,
-    isYearStart: Boolean
+    isYearStart: Boolean,
+    startDateMillis: Long,
+    endDateMillis: Long?,
+    title: String,
+    placeName: String?,
+    imageUrl: String?
 ) {
     // 월.일 추출 (예: 07.25)
-    val startDate = record.startDateMillis.toDateString("MM.dd")
-    val endDate = record.endDateMillis.toDateString("MM.dd")
+    val startDate = startDateMillis.toDateString("MM.dd")
+    val endDate = endDateMillis?.toDateString("MM.dd")
+
+    // 여행 날짜 텍스트 계산
+    val dateText = endDate?.let { "$startDate ~ $endDate" } ?: startDate
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -438,12 +449,12 @@ fun TimelineItem(
             ) {
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "$startDate ~ $endDate",
+                    text = dateText,
                     style = MomentoTheme.typography.body03,
                     color = MomentoTheme.colors.grayW20
                 )
                 Text(
-                    text = record.title,
+                    text = title,
                     style = MomentoTheme.typography.body02,
                     color = MomentoTheme.colors.grayW20,
                     maxLines = 1,
@@ -457,9 +468,9 @@ fun TimelineItem(
                         contentDescription = null
                     )
                     Spacer(Modifier.width(6.dp))
-                    record.selectedPlace?.let { selectedPlace ->
+                    placeName?.let { place ->
                         Text(
-                            text = selectedPlace.title,
+                            text = place,
                             style = MomentoTheme.typography.body03,
                             color = MomentoTheme.colors.grayW20
                         )
@@ -468,10 +479,10 @@ fun TimelineItem(
             }
         }
 
-        if (record.imageUrl.isNotEmpty()) {
+        imageUrl?.let { image ->
             AsyncImage(
                 modifier = Modifier.size(90.dp),
-                model = record.imageUrl,
+                model = image,
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
