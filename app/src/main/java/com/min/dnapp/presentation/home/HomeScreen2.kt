@@ -317,7 +317,7 @@ fun HomeCardImage(
 ) {
     Box(
         modifier = Modifier,
-        contentAlignment = Alignment.CenterStart
+        contentAlignment = Alignment.Center
     ) {
         AsyncImage(
             modifier = Modifier.size(100.dp),
