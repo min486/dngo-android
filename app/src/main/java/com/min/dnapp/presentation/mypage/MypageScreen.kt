@@ -55,11 +55,14 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 @Composable
 fun MypageScreen(
     navController: NavHostController,
-    mypageViewModel: MypageViewModel = hiltViewModel()
+    mypageViewModel: MypageViewModel = hiltViewModel(),
+    nicknameViewModel: NicknameViewModel = hiltViewModel()
 ) {
     val uiState by mypageViewModel.uiState.collectAsStateWithLifecycle()
     val showImageUpdateDialog by mypageViewModel.showImageUpdateDialog.collectAsStateWithLifecycle()
     val selectedImage by mypageViewModel.selectedImage.collectAsStateWithLifecycle()
+
+    val nicknameState by nicknameViewModel.nicknameState.collectAsStateWithLifecycle()
 
     var showNicknameUpdateDialog by remember { mutableStateOf(false) }
 
@@ -165,6 +168,10 @@ fun MypageScreen(
     // 닉네임 변경 모달창
     if (showNicknameUpdateDialog) {
         NicknameUpdateDialog(
+            state = nicknameState,
+            onValueChange = { newValue ->
+                nicknameViewModel.onNicknameChange(newValue)
+            },
             onDismiss = { showNicknameUpdateDialog = false },
             onCancel = { showNicknameUpdateDialog = false },
             onConfirm = { }

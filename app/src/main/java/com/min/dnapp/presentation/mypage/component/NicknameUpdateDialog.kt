@@ -16,24 +16,22 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.min.dnapp.presentation.mypage.NicknameValidationState
+import com.min.dnapp.presentation.ui.theme.ErrorRed
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @Composable
 fun NicknameUpdateDialog(
+    state: NicknameValidationState,
+    onValueChange: (String) -> Unit,
     onDismiss: () -> Unit,
     onCancel: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    var nickname by rememberSaveable { mutableStateOf("") }
-
     Dialog(
         onDismissRequest = onDismiss
     ) {
@@ -65,7 +63,7 @@ fun NicknameUpdateDialog(
                         .padding(start = 12.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {
-                    if (nickname.isEmpty()) {
+                    if (state.currentNickname.isEmpty()) {
                         Text(
                             text = "새 닉네임을 입력하세요.",
                             style = MomentoTheme.typography.body02,
@@ -74,12 +72,22 @@ fun NicknameUpdateDialog(
                     }
                     BasicTextField(
                         modifier = Modifier.fillMaxWidth(),
-                        value = nickname,
+                        value = state.currentNickname,
                         onValueChange = { newValue ->
-                            nickname = newValue
+                            onValueChange(newValue)
                         },
                         textStyle = MomentoTheme.typography.body02,
                         singleLine = true
+                    )
+                }
+
+                // 에러메시지 표시
+                if (state.errorMessage != null) {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = state.errorMessage,
+                        style = MomentoTheme.typography.body03,
+                        color = ErrorRed
                     )
                 }
 
@@ -111,14 +119,17 @@ fun NicknameUpdateDialog(
                         modifier = Modifier
                             .clickable { onConfirm() }
                             .weight(1f)
-                            .background(color = MomentoTheme.colors.pinkBase, shape = RoundedCornerShape(5.dp))
+                            .background(
+                                color = if (state.isValid) MomentoTheme.colors.pinkBase else MomentoTheme.colors.grayW80,
+                                shape = RoundedCornerShape(5.dp)
+                            )
                             .padding(vertical = 16.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = "저장",
                             style = MomentoTheme.typography.body01,
-                            color = MomentoTheme.colors.grayW20
+                            color = if (state.isValid) MomentoTheme.colors.grayW20 else MomentoTheme.colors.white
                         )
                     }
                 }

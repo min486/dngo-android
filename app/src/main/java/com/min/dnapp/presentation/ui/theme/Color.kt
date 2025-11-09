@@ -46,3 +46,4 @@ val White = Color(0xFFFFFFFF)
 
 // 기타
 val KakaoYellow = Color(0xFFFEE500)
+val ErrorRed = Color(0xFFEF5350)
