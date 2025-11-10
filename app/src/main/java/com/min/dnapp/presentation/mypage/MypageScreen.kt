@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -38,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.common.ProfileMapper
+import com.min.dnapp.presentation.mypage.component.NicknameUpdateDialog
 import com.min.dnapp.presentation.mypage.component.ProfileImageDialog
 import com.min.dnapp.presentation.ui.component.UserBadge
 import com.min.dnapp.presentation.ui.icon.AppIcons
@@ -55,6 +60,9 @@ fun MypageScreen(
     val uiState by mypageViewModel.uiState.collectAsStateWithLifecycle()
     val showImageUpdateDialog by mypageViewModel.showImageUpdateDialog.collectAsStateWithLifecycle()
     val selectedImage by mypageViewModel.selectedImage.collectAsStateWithLifecycle()
+    val nicknameState by mypageViewModel.nicknameState.collectAsStateWithLifecycle()
+
+    var showNicknameUpdateDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
@@ -120,7 +128,8 @@ fun MypageScreen(
                         nickname = data.user.nickname,
                         recordCnt = data.user.recordCnt,
                         stampCnt = data.user.stampCnt,
-                        onClick = { mypageViewModel.openDialog() }
+                        onImageClick = { mypageViewModel.openDialog() },
+                        onNicknameClick = { showNicknameUpdateDialog = true }
                     )
 
                     Spacer(Modifier.height(20.dp))
@@ -153,6 +162,23 @@ fun MypageScreen(
             onConfirm = { mypageViewModel.updateProfileImage() }
         )
     }
+
+    // 닉네임 변경 모달창
+    if (showNicknameUpdateDialog) {
+        NicknameUpdateDialog(
+            state = nicknameState,
+            onValueChange = { newValue ->
+                mypageViewModel.onNicknameChange(newValue)
+            },
+            onDismiss = { showNicknameUpdateDialog = false },
+            onCancel = { showNicknameUpdateDialog = false },
+            onConfirm = {
+                mypageViewModel.updateNickname(
+                    onSuccess = { showNicknameUpdateDialog = false }
+                )
+            }
+        )
+    }
 }
 
 @Composable
@@ -163,7 +189,8 @@ fun MypageProfileSection(
     nickname: String,
     recordCnt: Int,
     stampCnt: Int,
-    onClick: () -> Unit
+    onImageClick: () -> Unit,
+    onNicknameClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -172,7 +199,7 @@ fun MypageProfileSection(
         // 프로필 이미지 (수정 가능)
         UserProfileImage(
             profileImageName = profileImageName,
-            onClick = { onClick() }
+            onClick = { onImageClick() }
         )
 
         Spacer(Modifier.height(12.dp))
@@ -186,10 +213,9 @@ fun MypageProfileSection(
         Spacer(Modifier.height(16.dp))
 
         // 닉네임
-        Text(
-            text = nickname,
-            style = MomentoTheme.typography.title01,
-            color = MomentoTheme.colors.grayW20
+        UserNickname(
+            nickname = nickname,
+            onClick = { onNicknameClick() }
         )
 
         Spacer(Modifier.height(28.dp))
@@ -239,6 +265,41 @@ fun UserProfileImage(
                 tint = MomentoTheme.colors.grayW60
             )
         }
+    }
+}
+
+@Composable
+fun UserNickname(
+    nickname: String,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .clickable { onClick() }
+            .width(120.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(Modifier.width(16.dp))
+            Text(
+                text = nickname,
+                style = MomentoTheme.typography.title01,
+                color = MomentoTheme.colors.grayW20
+            )
+            Icon(
+                modifier = Modifier.size(16.dp),
+                imageVector = AppIcons.PenSmall,
+                contentDescription = null,
+                tint = MomentoTheme.colors.grayW60
+            )
+        }
+
+        Spacer(Modifier.height(4.dp))
+
+        HorizontalDivider(thickness = 1.dp, color = MomentoTheme.colors.grayW60)
     }
 }
 

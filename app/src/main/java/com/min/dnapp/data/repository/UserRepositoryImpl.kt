@@ -57,4 +57,23 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun updateNickname(nickname: String): Result<Unit> {
+        val userId = currentUserId
+        val userDoc = firestore.collection("users").document(userId)
+
+        val newNickname = mapOf(
+            "nickname" to nickname
+        )
+
+        return withContext(Dispatchers.IO) {
+            try {
+                userDoc.update(newNickname).await()
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Log.e("record", "updateNickname error", e)
+                Result.failure(e)
+            }
+        }
+    }
 }
