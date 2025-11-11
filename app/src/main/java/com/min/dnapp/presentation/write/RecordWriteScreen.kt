@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -55,6 +56,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -74,11 +76,13 @@ import com.min.dnapp.presentation.ui.component.CustomSnackbar
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Back
 import com.min.dnapp.presentation.ui.icon.appicons.Calendar
+import com.min.dnapp.presentation.ui.icon.appicons.Delete
 import com.min.dnapp.presentation.ui.icon.appicons.Gallery
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 import com.min.dnapp.presentation.write.component.EmotionBottomSheetContent
 import com.min.dnapp.presentation.write.component.PlaceBottomSheetContent
+import com.min.dnapp.presentation.write.component.PlaceWarningDialog
 import com.min.dnapp.presentation.write.component.ShareGuide
 import com.min.dnapp.presentation.write.component.WeatherBottomSheetContent
 import com.min.dnapp.util.toLocalDate
@@ -109,6 +113,8 @@ fun RecordWriteScreen(
         // halfExpanded 상태 건너뛰기
         skipPartiallyExpanded = true
     )
+    // 저장된 여행지 삭제 경고 모달
+    var showPlaceWarning by remember { mutableStateOf(false) }
 
     // Photo Picker 런처 등록
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
@@ -278,9 +284,16 @@ fun RecordWriteScreen(
                     selectedPlace = uiState.selectedPlace,
                     overseasPlace = uiState.overseasPlace,
                     onValueChange = { newValue ->
+                        // 해외 여행지 입력 시, 국내 여행지 저장된 경우
+                        if (uiState.selectedPlace != null) { viewModel.clearSelectedPlace() }
                         viewModel.updateOverseas(newValue)
                     },
-                    onClick = { showPlaceBottomSheet = true }
+                    onAddClick = {
+                        // 국내 여행지 추가 클릭 시, 해외 여행지 저장된 경우
+                        if (uiState.overseasPlace.isNotEmpty()) { viewModel.clearOverseasPlace() }
+                        showPlaceBottomSheet = true
+                     },
+                    onWarningClick = { showPlaceWarning = true }
                 )
 
                 Spacer(Modifier.height(40.dp))
@@ -291,7 +304,8 @@ fun RecordWriteScreen(
                     recordContent = uiState.recordContent,
                     onValueChange = { newValue ->
                         viewModel.updateContent(newValue)
-                    }
+                    },
+                    onClick = { viewModel.clearSelectedImageUri() }
                 )
             }
         }
@@ -432,8 +446,7 @@ fun RecordWriteScreen(
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
             PlaceBottomSheetContent(
-                value = uiState.searchState.query,
-                places = uiState.searchState.places,
+                searchState = uiState.searchState,
                 onValueChange = { newValue ->
                     viewModel.updateQuery(newValue)
                 },
@@ -445,6 +458,18 @@ fun RecordWriteScreen(
                 }
             )
         }
+    }
+
+    // 해외 버튼 클릭 시 경고 모달 표시 (국내 여행지 저장된 경우)
+    if (showPlaceWarning) {
+        PlaceWarningDialog(
+            onDismiss = { showPlaceWarning = false },
+            onCancel = { showPlaceWarning = false },
+            onConfirm = {
+                viewModel.clearSelectedPlace()
+                showPlaceWarning = false
+            }
+        )
     }
 }
 
@@ -614,7 +639,8 @@ fun WritePlaceSection(
     selectedPlace: LocalPlace?,
     overseasPlace: String,
     onValueChange: (String) -> Unit,
-    onClick: () -> Unit,
+    onAddClick: () -> Unit,
+    onWarningClick: () -> Unit,
 ) {
     val radioOptions = listOf("국내", "해외 (직접 입력)")
     var selectedCountry by remember { mutableStateOf("국내") }
@@ -641,7 +667,11 @@ fun WritePlaceSection(
                     RadioButton(
                         modifier = Modifier.size(24.dp),
                         selected = (text == selectedCountry),
-                        onClick = { selectedCountry = text },
+                        onClick = {
+                            // 해외 버튼 클릭 & 저장된 국내 여행지 있는 경우
+                            if (idx == 1 && selectedPlace != null) { onWarningClick() }
+                            selectedCountry = text
+                        },
                         colors = RadioButtonDefaults.colors(
                             selectedColor = MomentoTheme.colors.greenW20,
                             unselectedColor = MomentoTheme.colors.grayW80,
@@ -665,7 +695,7 @@ fun WritePlaceSection(
 
         if (selectedCountry == "국내") {
             Row(
-                modifier = Modifier.clickable { onClick() },
+                modifier = Modifier.clickable { onAddClick() },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
@@ -750,7 +780,8 @@ fun WriteTitleSection(
 fun WriteContentSection(
     selectedImageUri: Uri?,
     recordContent: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    onClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -764,7 +795,8 @@ fun WriteContentSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
+//                .height(300.dp)
+                .height(280.dp)
                 .background(color = MomentoTheme.colors.brownBg)
                 .padding(16.dp)
         ) {
@@ -785,18 +817,38 @@ fun WriteContentSection(
         }
         // 선택된 이미지
         selectedImageUri?.let { uri ->
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(color = MomentoTheme.colors.brownBg)
-                    .padding(start = 16.dp, bottom = 16.dp)
+                    .padding(start = 16.dp, bottom = 16.dp),
             ) {
-                AsyncImage(
-                    model = uri,
-                    contentDescription = null,
-                    modifier = Modifier.size(72.dp),
-                    contentScale = ContentScale.Crop
-                )
+                Box(
+                    contentAlignment = Alignment.TopEnd
+                ) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(RoundedCornerShape(5.dp)),
+                        model = uri,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .offset(x = 8.dp, y = (-8).dp)
+                            .clickable { onClick() }
+                            .background(color = MomentoTheme.colors.white, shape = CircleShape)
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(20.dp),
+                            imageVector = AppIcons.Delete,
+                            contentDescription = null,
+                            tint = MomentoTheme.colors.grayW60
+                        )
+                    }
+                }
             }
         }
     }
