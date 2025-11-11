@@ -304,4 +304,11 @@ class RecordWriteViewModel @Inject constructor(
     fun clearOverseasPlace() {
         _uiState.update { it.copy(overseasPlace = "") }
     }
+
+    /**
+     * 선택된 이미지 삭제
+     */
+    fun clearSelectedImageUri() {
+        _uiState.update { it.copy(selectedImageUri = null) }
+    }
 }
