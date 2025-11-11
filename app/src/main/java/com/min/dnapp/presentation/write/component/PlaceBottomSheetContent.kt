@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,11 +37,11 @@ import com.min.dnapp.domain.model.LocalPlace
 import com.min.dnapp.presentation.ui.component.SelectButton
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
+import com.min.dnapp.presentation.write.SearchState
 
 @Composable
 fun PlaceBottomSheetContent(
-    value: String,
-    places: List<LocalPlace>,
+    searchState: SearchState,
     onValueChange: (String) -> Unit,
     onSearch: () -> Unit,
     onClear: () -> Unit,
@@ -74,7 +76,7 @@ fun PlaceBottomSheetContent(
                 .border(width = 1.dp, color = MomentoTheme.colors.grayW80, shape = RoundedCornerShape(6.dp))
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            if (value.isEmpty()) {
+            if (searchState.query.isEmpty()) {
                 Text(
                     text = "여행지를 입력해주세요",
                     style = MomentoTheme.typography.body01,
@@ -90,7 +92,7 @@ fun PlaceBottomSheetContent(
                             onClear()
                         }
                     },
-                value = value,
+                value = searchState.query,
                 onValueChange = onValueChange,
                 textStyle = MomentoTheme.typography.body01,
                 singleLine = true,
@@ -103,11 +105,20 @@ fun PlaceBottomSheetContent(
 
         Spacer(Modifier.height(20.dp))
 
+        // 검색 진행 시 로딩 인디케이터 표시
+        if (searchState.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(40.dp),
+                color = MomentoTheme.colors.brownW20,
+                strokeWidth = 4.dp
+            )
+        }
+
         // 검색 결과 목록
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            places.forEach { item ->
+            searchState.places.forEach { item ->
                 PlaceItem(
                     placeName = item.title,
                     placeCategory = item.category,

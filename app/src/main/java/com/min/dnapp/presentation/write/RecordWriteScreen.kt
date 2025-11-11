@@ -432,8 +432,7 @@ fun RecordWriteScreen(
             shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
         ) {
             PlaceBottomSheetContent(
-                value = uiState.searchState.query,
-                places = uiState.searchState.places,
+                searchState = uiState.searchState,
                 onValueChange = { newValue ->
                     viewModel.updateQuery(newValue)
                 },
@@ -764,7 +763,8 @@ fun WriteContentSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
+//                .height(300.dp)
+                .height(280.dp)
                 .background(color = MomentoTheme.colors.brownBg)
                 .padding(16.dp)
         ) {
