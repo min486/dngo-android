@@ -79,6 +79,7 @@ import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 import com.min.dnapp.presentation.write.component.EmotionBottomSheetContent
 import com.min.dnapp.presentation.write.component.PlaceBottomSheetContent
+import com.min.dnapp.presentation.write.component.PlaceWarningDialog
 import com.min.dnapp.presentation.write.component.ShareGuide
 import com.min.dnapp.presentation.write.component.WeatherBottomSheetContent
 import com.min.dnapp.util.toLocalDate
@@ -109,6 +110,8 @@ fun RecordWriteScreen(
         // halfExpanded 상태 건너뛰기
         skipPartiallyExpanded = true
     )
+    // 저장된 여행지 삭제 경고 모달
+    var showPlaceWarning by remember { mutableStateOf(false) }
 
     // Photo Picker 런처 등록
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
@@ -278,9 +281,16 @@ fun RecordWriteScreen(
                     selectedPlace = uiState.selectedPlace,
                     overseasPlace = uiState.overseasPlace,
                     onValueChange = { newValue ->
+                        // 해외 여행지 입력 시, 국내 여행지 저장된 경우
+                        if (uiState.selectedPlace != null) { viewModel.clearSelectedPlace() }
                         viewModel.updateOverseas(newValue)
                     },
-                    onClick = { showPlaceBottomSheet = true }
+                    onAddClick = {
+                        // 국내 여행지 추가 클릭 시, 해외 여행지 저장된 경우
+                        if (uiState.overseasPlace.isNotEmpty()) { viewModel.clearOverseasPlace() }
+                        showPlaceBottomSheet = true
+                     },
+                    onWarningClick = { showPlaceWarning = true }
                 )
 
                 Spacer(Modifier.height(40.dp))
@@ -444,6 +454,18 @@ fun RecordWriteScreen(
                 }
             )
         }
+    }
+
+    // 해외 버튼 클릭 시 경고 모달 표시 (국내 여행지 저장된 경우)
+    if (showPlaceWarning) {
+        PlaceWarningDialog(
+            onDismiss = { showPlaceWarning = false },
+            onCancel = { showPlaceWarning = false },
+            onConfirm = {
+                viewModel.clearSelectedPlace()
+                showPlaceWarning = false
+            }
+        )
     }
 }
 
@@ -613,7 +635,8 @@ fun WritePlaceSection(
     selectedPlace: LocalPlace?,
     overseasPlace: String,
     onValueChange: (String) -> Unit,
-    onClick: () -> Unit,
+    onAddClick: () -> Unit,
+    onWarningClick: () -> Unit,
 ) {
     val radioOptions = listOf("국내", "해외 (직접 입력)")
     var selectedCountry by remember { mutableStateOf("국내") }
@@ -640,7 +663,11 @@ fun WritePlaceSection(
                     RadioButton(
                         modifier = Modifier.size(24.dp),
                         selected = (text == selectedCountry),
-                        onClick = { selectedCountry = text },
+                        onClick = {
+                            // 해외 버튼 클릭 & 저장된 국내 여행지 있는 경우
+                            if (idx == 1 && selectedPlace != null) { onWarningClick() }
+                            selectedCountry = text
+                        },
                         colors = RadioButtonDefaults.colors(
                             selectedColor = MomentoTheme.colors.greenW20,
                             unselectedColor = MomentoTheme.colors.grayW80,
@@ -664,7 +691,7 @@ fun WritePlaceSection(
 
         if (selectedCountry == "국내") {
             Row(
-                modifier = Modifier.clickable { onClick() },
+                modifier = Modifier.clickable { onAddClick() },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(

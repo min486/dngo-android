@@ -16,7 +16,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -290,5 +289,19 @@ class RecordWriteViewModel @Inject constructor(
         }
 
         return null
+    }
+
+    /**
+     * 저장된 국내 여행지 삭제
+     */
+    fun clearSelectedPlace() {
+        _uiState.update { it.copy(selectedPlace = null) }
+    }
+
+    /**
+     * 저장된 해외 여행지 삭제
+     */
+    fun clearOverseasPlace() {
+        _uiState.update { it.copy(overseasPlace = "") }
     }
 }
