@@ -21,7 +21,7 @@ val AllBadges = listOf(
         resId = R.drawable.badge_bronze
     ),
     Badge(
-        level = 2,
+        level = 3,
         name = "여행자",
         description = "다음 뱃지까지 10개 남았어요",
         minStamp = 20,
@@ -29,7 +29,7 @@ val AllBadges = listOf(
         resId = R.drawable.badge_silver
     ),
     Badge(
-        level = 3,
+        level = 4,
         name = "마스터",
         description = "최고 뱃지에 도달하셨어요",
         minStamp = 30,

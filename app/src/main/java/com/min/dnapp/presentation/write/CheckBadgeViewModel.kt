@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.min.dnapp.domain.usecase.GetBadgeDialogDataUseCase
 import com.min.dnapp.domain.usecase.GetCurrentUserIdUseCase
 import com.min.dnapp.domain.usecase.GetUserDataUseCase
+import com.min.dnapp.domain.usecase.UpdateUserBadgeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,10 +16,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LevelUpViewModel @Inject constructor(
+class CheckBadgeViewModel @Inject constructor(
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
-    private val getBadgeDialogDataUseCase: GetBadgeDialogDataUseCase
+    private val getBadgeDialogDataUseCase: GetBadgeDialogDataUseCase,
+    private val updateUserBadgeUseCase: UpdateUserBadgeUseCase
 ) : ViewModel() {
 
     private val _dialogState = MutableStateFlow<WriteFinishDialogState>(WriteFinishDialogState.Hidden)
@@ -42,16 +44,31 @@ class LevelUpViewModel @Inject constructor(
                 return@launch
             }
 
+            val useData = getUserDataUseCase(uid)
+            val userStamp = useData.stampCnt
+            val newBadge = getBadgeDialogDataUseCase(userStamp)
+
+            // 뱃지 업데이트 DB에 반영
+            if (newBadge != null) {
+                val result = updateUserBadgeUseCase(newBadge)
+
+                // DB 업데이트 실패 시
+                if (result.isFailure) {
+                    Log.e("user", "뱃지 DB 업데이트 실패: ${result.exceptionOrNull()}")
+
+                    _dialogState.value = WriteFinishDialogState.StampDialog
+                    return@launch
+                }
+            }
+
             // 1초 지연 후 모달 표시
             delay(1000)
 
-            val useData = getUserDataUseCase(uid)
-            val userStamp = useData.stampCnt
-
-            val newBadge = getBadgeDialogDataUseCase(userStamp)
             _dialogState.value = if (newBadge != null) {
+                // 뱃지 모달 표시
                 WriteFinishDialogState.BadgeDialog(newBadge)
             } else {
+                // 스탬프 모달 표시
                 WriteFinishDialogState.StampDialog
             }
         }

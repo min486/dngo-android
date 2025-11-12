@@ -34,7 +34,7 @@ import com.min.dnapp.presentation.write.component.WriteStampDialog
 @Composable
 fun WriteFinishScreen(
     navController: NavHostController,
-    viewModel: LevelUpViewModel = hiltViewModel()
+    viewModel: CheckBadgeViewModel = hiltViewModel()
 ) {
     val currentDialogState by viewModel.dialogState.collectAsStateWithLifecycle()
 
