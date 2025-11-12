@@ -109,6 +109,8 @@ dependencies {
     // coil
     implementation(libs.coil)
     implementation(libs.coil.okhttp)
+    // lottie compose
+    implementation(libs.lottie.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
