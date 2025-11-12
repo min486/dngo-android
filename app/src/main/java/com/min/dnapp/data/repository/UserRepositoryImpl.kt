@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.min.dnapp.data.remote.dto.UserEntity
+import com.min.dnapp.domain.model.Badge
 import com.min.dnapp.domain.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -72,6 +73,26 @@ class UserRepositoryImpl @Inject constructor(
                 Result.success(Unit)
             } catch (e: Exception) {
                 Log.e("record", "updateNickname error", e)
+                Result.failure(e)
+            }
+        }
+    }
+
+    override suspend fun updateBadge(badge: Badge): Result<Unit> {
+        val userId = currentUserId
+        val userDoc = firestore.collection("users").document(userId)
+
+        val newBadge = mapOf(
+            "badgeLv" to badge.level,
+            "badgeName" to badge.name
+        )
+
+        return withContext(Dispatchers.IO) {
+            try {
+                userDoc.update(newBadge).await()
+                Result.success(Unit)
+            } catch (e: Exception) {
+                Log.e("user", "updateBadge error", e)
                 Result.failure(e)
             }
         }

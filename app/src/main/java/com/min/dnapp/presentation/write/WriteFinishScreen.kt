@@ -16,33 +16,27 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
+import com.min.dnapp.presentation.write.component.LevelUpDialog
 import com.min.dnapp.presentation.write.component.WriteStampDialog
-import kotlinx.coroutines.delay
 
 @Composable
 fun WriteFinishScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: CheckBadgeViewModel = hiltViewModel()
 ) {
-    var showStampDialog by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        delay(1000)
-        showStampDialog = true
-    }
+    val currentDialogState by viewModel.dialogState.collectAsStateWithLifecycle()
 
     Surface(
         modifier = Modifier
@@ -101,12 +95,23 @@ fun WriteFinishScreen(
         }
     }
 
-    // 스탬프 지급 모달창
-    if (showStampDialog) {
-        WriteStampDialog(
-            onDismiss = { showStampDialog = false },
-            onConfirm = { showStampDialog = false }
-        )
+    when (currentDialogState) {
+        is WriteFinishDialogState.BadgeDialog -> {
+            val data = currentDialogState as WriteFinishDialogState.BadgeDialog
+
+            LevelUpDialog(
+                badge = data.badge,
+                onDismiss = { viewModel.closeDialog() },
+                onConfirm = { viewModel.closeDialog() },
+            )
+        }
+        is WriteFinishDialogState.StampDialog -> {
+            WriteStampDialog(
+                onDismiss = { viewModel.closeDialog() },
+                onConfirm = { viewModel.closeDialog() }
+            )
+        }
+        is WriteFinishDialogState.Hidden -> {}
     }
 }
 
