@@ -5,16 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -26,6 +22,10 @@ import com.min.dnapp.presentation.bell.BellScreen
 import com.min.dnapp.presentation.find.FindDetailScreen
 import com.min.dnapp.presentation.find.FindScreen
 import com.min.dnapp.presentation.home.HomeScreen2
+import com.min.dnapp.presentation.init.OnboardingScreen
+import com.min.dnapp.presentation.init.OnboardingScreen2
+import com.min.dnapp.presentation.init.OnboardingScreen3
+import com.min.dnapp.presentation.init.ProfileSelectScreen
 import com.min.dnapp.presentation.login.LoginScreen2
 import com.min.dnapp.presentation.mypage.MyRecordScreen
 import com.min.dnapp.presentation.mypage.MypageScreen
@@ -67,7 +67,8 @@ fun MomentoApp(
     val currentRoute = navBackStackEntry?.destination?.route ?: "home"
 
     val showBottomBar = when (currentRoute) {
-        "login", "bell", "find_detail", "record_write", "write_finish", "my_record", "setting" -> false
+        "login", "bell", "find_detail", "record_write", "write_finish", "my_record", "setting",
+        "onboarding", "onboarding2", "onboarding3", "profile_select" -> false
         else -> true
     }
 
@@ -122,6 +123,18 @@ fun MomentoApp(
             }
             composable("setting") {
                 SettingScreen(navController = navController)
+            }
+            composable("onboarding") {
+                OnboardingScreen()
+            }
+            composable("onboarding2") {
+                OnboardingScreen2()
+            }
+            composable("onboarding3") {
+                OnboardingScreen3()
+            }
+            composable("profile_select") {
+                ProfileSelectScreen()
             }
         }
     }

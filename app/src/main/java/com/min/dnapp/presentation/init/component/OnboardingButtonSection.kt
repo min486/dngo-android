@@ -1,4 +1,4 @@
-package com.min.dnapp.presentation.onboarding.component
+package com.min.dnapp.presentation.init.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

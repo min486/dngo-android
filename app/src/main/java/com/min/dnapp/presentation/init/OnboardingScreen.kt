@@ -1,4 +1,4 @@
-package com.min.dnapp.presentation.onboarding
+package com.min.dnapp.presentation.init
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.min.dnapp.R
-import com.min.dnapp.presentation.onboarding.component.OnboardingButtonSection
+import com.min.dnapp.presentation.init.component.OnboardingButtonSection
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
