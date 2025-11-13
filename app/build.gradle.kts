@@ -111,6 +111,8 @@ dependencies {
     implementation(libs.coil.okhttp)
     // lottie compose
     implementation(libs.lottie.compose)
+    // preferences datastore
+    implementation(libs.datastore.preferences)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
