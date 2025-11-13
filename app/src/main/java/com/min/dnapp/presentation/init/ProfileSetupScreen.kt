@@ -29,8 +29,9 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileSelectScreen(
-    viewModel: AppInitViewModel = hiltViewModel()
+fun ProfileSetupScreen(
+    viewModel: AppInitViewModel = hiltViewModel(),
+    onFinish: () -> Unit
 ) {
     val selectedImage by viewModel.selectedImage.collectAsStateWithLifecycle()
 
@@ -102,7 +103,7 @@ fun ProfileSelectScreen(
             ) {
                 SelectButton(
                     enabled = selectedImage != null,
-                    onConfirm = { }
+                    onConfirm = { onFinish() }
                 )
                 Spacer(Modifier.height(20.dp))
             }
@@ -114,6 +115,6 @@ fun ProfileSelectScreen(
 @Composable
 fun ProfileSelectScreenPreview() {
     DngoTheme {
-        ProfileSelectScreen()
+//        ProfileSetupScreen()
     }
 }

@@ -22,14 +22,11 @@ import com.min.dnapp.presentation.bell.BellScreen
 import com.min.dnapp.presentation.find.FindDetailScreen
 import com.min.dnapp.presentation.find.FindScreen
 import com.min.dnapp.presentation.home.HomeScreen2
-import com.min.dnapp.presentation.init.OnboardingScreen
-import com.min.dnapp.presentation.init.OnboardingScreen2
-import com.min.dnapp.presentation.init.OnboardingScreen3
-import com.min.dnapp.presentation.init.ProfileSelectScreen
 import com.min.dnapp.presentation.login.LoginScreen2
 import com.min.dnapp.presentation.mypage.MyRecordScreen
 import com.min.dnapp.presentation.mypage.MypageScreen
 import com.min.dnapp.presentation.mypage.SettingScreen
+import com.min.dnapp.presentation.navigation.AppInitHost
 import com.min.dnapp.presentation.ui.component.MomentoBottomNav
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.write.RecordWriteScreen
@@ -60,16 +57,18 @@ fun MomentoApp(
     appStartViewModel: AppStartViewModel = hiltViewModel()
 ) {
     val isLogin by appStartViewModel.isLogin.collectAsStateWithLifecycle()
-    val startDestination = if (isLogin) "home" else "login"
+    val startDestination = if (isLogin) "init_host" else "login"
 
+    // root navigation 담당
     val navController = rememberNavController()
+
+    // root navigation 경로
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: "home"
+    val currentRoute = navBackStackEntry?.destination?.route ?: startDestination
 
     val showBottomBar = when (currentRoute) {
-        "login", "bell", "find_detail", "record_write", "write_finish", "my_record", "setting",
-        "onboarding", "onboarding2", "onboarding3", "profile_select" -> false
-        else -> true
+        "home", "find", "my" -> true
+        else -> false
     }
 
     Scaffold(
@@ -95,8 +94,26 @@ fun MomentoApp(
             startDestination = startDestination
         ) {
             composable("login") {
-                LoginScreen2(navController = navController)
+                LoginScreen2(
+                    navController = navController,
+                    onLoginSuccess = {
+                        navController.navigate("init_host") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                )
             }
+
+            composable("init_host") {
+                AppInitHost(
+                    onInitComplete = {
+                        navController.navigate("home") {
+                            popUpTo("init_host") { inclusive = true }
+                        }
+                    }
+                )
+            }
+
             composable("home") {
                 HomeScreen2(navController = navController)
             }
@@ -106,6 +123,7 @@ fun MomentoApp(
             composable("my") {
                 MypageScreen(navController = navController)
             }
+
             composable("bell") {
                 BellScreen(navController = navController)
             }
@@ -123,18 +141,6 @@ fun MomentoApp(
             }
             composable("setting") {
                 SettingScreen(navController = navController)
-            }
-            composable("onboarding") {
-                OnboardingScreen()
-            }
-            composable("onboarding2") {
-                OnboardingScreen2()
-            }
-            composable("onboarding3") {
-                OnboardingScreen3()
-            }
-            composable("profile_select") {
-                ProfileSelectScreen()
             }
         }
     }

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.min.dnapp.R
 import com.min.dnapp.presentation.init.component.OnboardingButtonSection
 import com.min.dnapp.presentation.ui.icon.AppIcons
@@ -30,7 +31,10 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OnboardingScreen2() {
+fun OnboardingScreen2(
+    navController: NavHostController,
+    onFinish: () -> Unit
+) {
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
         topBar = {
@@ -39,7 +43,7 @@ fun OnboardingScreen2() {
                 navigationIcon = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.popBackStack() }
                             .padding(16.dp),
                         imageVector = AppIcons.Back,
                         contentDescription = null
@@ -69,8 +73,9 @@ fun OnboardingScreen2() {
             }
 
             OnboardingButtonSection(
+                onboardingNum = 2,
                 title = "여행을 기록할 때마다 스탬프가 적립돼요. \n하나의 기록이 모여 나만의 컬렉션이 완성됩니다. \n",
-                onClick = {}
+                onClick = { onFinish() }
             )
         }
     }
@@ -80,6 +85,6 @@ fun OnboardingScreen2() {
 @Composable
 fun OnboardingScreen2Preview() {
     DngoTheme {
-        OnboardingScreen2()
+//        OnboardingScreen2()
     }
 }
