@@ -43,7 +43,8 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 @Composable
 fun LoginScreen2(
     navController: NavHostController,
-    viewModel: LoginViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel(),
+    onLoginSuccess: () -> Unit
 ) {
     val context = LocalContext.current
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
@@ -64,11 +65,7 @@ fun LoginScreen2(
                 onClick = {
                     viewModel.onKakaoLoginClicked(
                         context = context,
-                        onSuccess = {
-                            navController.navigate("home") {
-                                popUpTo("login") { inclusive = true }
-                            }
-                        },
+                        onSuccess = { onLoginSuccess() },
                         onFailure = {
 
                         }

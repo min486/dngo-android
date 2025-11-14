@@ -1,4 +1,4 @@
-package com.min.dnapp.presentation.onboarding.component
+package com.min.dnapp.presentation.init.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +23,7 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @Composable
 fun OnboardingButtonSection(
+    onboardingNum: Int,
     title: String,
     onClick: () -> Unit
 ) {
@@ -38,7 +38,6 @@ fun OnboardingButtonSection(
         ) {
             Spacer(Modifier.height(40.dp))
             Text(
-//                text = "모멘토와 함께하는 따뜻하고 진솔한 공간. \n제목, 날짜, 장소, 감정을 \n입력하여 내 기록을 남겨보세요.",
                 text = title,
                 style = MomentoTheme.typography.body01,
                 color = MomentoTheme.colors.black,
@@ -53,23 +52,16 @@ fun OnboardingButtonSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row {
-                    Box(
-                        modifier = Modifier
-                            .width(16.dp)
-                            .height(8.dp)
-                            .background(color = MomentoTheme.colors.pinkBase, shape = RoundedCornerShape(20.dp))
+                    OnboardingIndicator(
+                        isActive = onboardingNum == 1
                     )
                     Spacer(Modifier.width(4.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(color = MomentoTheme.colors.pinkW40, shape = CircleShape)
+                    OnboardingIndicator(
+                        isActive = onboardingNum == 2
                     )
                     Spacer(Modifier.width(4.dp))
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(color = MomentoTheme.colors.pinkW40, shape = CircleShape)
+                    OnboardingIndicator(
+                        isActive = onboardingNum == 3
                     )
                 }
                 Box(
@@ -89,5 +81,19 @@ fun OnboardingButtonSection(
             Spacer(Modifier.height(20.dp))
         }
     }
+}
 
+@Composable
+private fun OnboardingIndicator(isActive: Boolean) {
+    val indicatorColor = if (isActive) MomentoTheme.colors.pinkBase else MomentoTheme.colors.pinkW40
+    val indicatorShape = if (isActive) RoundedCornerShape(20.dp) else CircleShape
+    val indicatorWidth = if (isActive) 16.dp else 8.dp
+    val indicatorHeight = 8.dp
+
+    Box(
+        modifier = Modifier
+            .width(indicatorWidth)
+            .height(indicatorHeight)
+            .background(color = indicatorColor, shape = indicatorShape)
+    )
 }

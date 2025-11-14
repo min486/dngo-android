@@ -1,4 +1,4 @@
-package com.min.dnapp.presentation.onboarding
+package com.min.dnapp.presentation.init
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -21,8 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.min.dnapp.R
-import com.min.dnapp.presentation.onboarding.component.OnboardingButtonSection
+import com.min.dnapp.presentation.init.component.OnboardingButtonSection
 import com.min.dnapp.presentation.ui.icon.AppIcons
 import com.min.dnapp.presentation.ui.icon.appicons.Back
 import com.min.dnapp.presentation.ui.theme.DngoTheme
@@ -30,7 +31,10 @@ import com.min.dnapp.presentation.ui.theme.MomentoTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OnboardingScreen3() {
+fun OnboardingScreen3(
+    navController: NavHostController,
+    onFinish: () -> Unit
+) {
     Scaffold(
         containerColor = MomentoTheme.colors.brownW90,
         topBar = {
@@ -39,7 +43,7 @@ fun OnboardingScreen3() {
                 navigationIcon = {
                     Icon(
                         modifier = Modifier
-                            .clickable {  }
+                            .clickable { navController.popBackStack() }
                             .padding(16.dp),
                         imageVector = AppIcons.Back,
                         contentDescription = null
@@ -69,8 +73,9 @@ fun OnboardingScreen3() {
             }
 
             OnboardingButtonSection(
+                onboardingNum = 3,
                 title = "솔직한 기록을 다른 사람과 가볍게 나누기 \n공감과 영감을 주고받는 공간입니다. \n",
-                onClick = {}
+                onClick = { onFinish() }
             )
         }
     }
@@ -80,6 +85,6 @@ fun OnboardingScreen3() {
 @Composable
 fun OnboardingScreen3Preview() {
     DngoTheme {
-        OnboardingScreen3()
+//        OnboardingScreen3()
     }
 }

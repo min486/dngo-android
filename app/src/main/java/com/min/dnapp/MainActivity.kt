@@ -5,16 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -30,6 +26,7 @@ import com.min.dnapp.presentation.login.LoginScreen2
 import com.min.dnapp.presentation.mypage.MyRecordScreen
 import com.min.dnapp.presentation.mypage.MypageScreen
 import com.min.dnapp.presentation.mypage.SettingScreen
+import com.min.dnapp.presentation.navigation.AppInitHost
 import com.min.dnapp.presentation.ui.component.MomentoBottomNav
 import com.min.dnapp.presentation.ui.theme.DngoTheme
 import com.min.dnapp.presentation.write.RecordWriteScreen
@@ -60,15 +57,18 @@ fun MomentoApp(
     appStartViewModel: AppStartViewModel = hiltViewModel()
 ) {
     val isLogin by appStartViewModel.isLogin.collectAsStateWithLifecycle()
-    val startDestination = if (isLogin) "home" else "login"
+    val startDestination = if (isLogin) "init_host" else "login"
 
+    // root navigation 담당
     val navController = rememberNavController()
+
+    // root navigation 경로
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: "home"
+    val currentRoute = navBackStackEntry?.destination?.route ?: startDestination
 
     val showBottomBar = when (currentRoute) {
-        "login", "bell", "find_detail", "record_write", "write_finish", "my_record", "setting" -> false
-        else -> true
+        "home", "find", "my" -> true
+        else -> false
     }
 
     Scaffold(
@@ -94,8 +94,26 @@ fun MomentoApp(
             startDestination = startDestination
         ) {
             composable("login") {
-                LoginScreen2(navController = navController)
+                LoginScreen2(
+                    navController = navController,
+                    onLoginSuccess = {
+                        navController.navigate("init_host") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                )
             }
+
+            composable("init_host") {
+                AppInitHost(
+                    onInitComplete = {
+                        navController.navigate("home") {
+                            popUpTo("init_host") { inclusive = true }
+                        }
+                    }
+                )
+            }
+
             composable("home") {
                 HomeScreen2(navController = navController)
             }
@@ -105,6 +123,7 @@ fun MomentoApp(
             composable("my") {
                 MypageScreen(navController = navController)
             }
+
             composable("bell") {
                 BellScreen(navController = navController)
             }

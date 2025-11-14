@@ -1,9 +1,11 @@
 package com.min.dnapp.data.di
 
+import com.min.dnapp.data.repository.AppInitRepositoryImpl
 import com.min.dnapp.data.repository.AuthRepositoryImpl
 import com.min.dnapp.data.repository.LocalSearchRepositoryImpl
 import com.min.dnapp.data.repository.RecordRepositoryImpl
 import com.min.dnapp.data.repository.UserRepositoryImpl
+import com.min.dnapp.domain.repository.AppInitRepository
 import com.min.dnapp.domain.repository.AuthRepository
 import com.min.dnapp.domain.repository.LocalSearchRepository
 import com.min.dnapp.domain.repository.RecordRepository
@@ -41,4 +43,10 @@ abstract class RepositoryModule {
     abstract fun bindUserRepository(
         userRepositoryImpl: UserRepositoryImpl
     ): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAppInitRepository(
+        appInitRepositoryImpl: AppInitRepositoryImpl
+    ): AppInitRepository
 }
