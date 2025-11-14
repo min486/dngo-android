@@ -85,7 +85,6 @@ fun AppInitHost(
         composable("profile_setup") {
             ProfileSetupScreen(
                 onFinish = {
-                    appInitViewModel.onProfileSetupFinished()
                     onInitComplete()
                 }
             )

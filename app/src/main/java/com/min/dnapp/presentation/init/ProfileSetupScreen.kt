@@ -1,6 +1,7 @@
 package com.min.dnapp.presentation.init
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -34,6 +37,7 @@ fun ProfileSetupScreen(
     onFinish: () -> Unit
 ) {
     val selectedImage by viewModel.selectedImage.collectAsStateWithLifecycle()
+    val saveImageState by viewModel.saveImageState.collectAsStateWithLifecycle()
 
     Scaffold(
         containerColor = MomentoTheme.colors.brownBg,
@@ -103,10 +107,30 @@ fun ProfileSetupScreen(
             ) {
                 SelectButton(
                     enabled = selectedImage != null,
-                    onConfirm = { onFinish() }
+                    onConfirm = { viewModel.saveProfileImage() }
                 )
                 Spacer(Modifier.height(20.dp))
             }
+        }
+    }
+
+    when (saveImageState) {
+        is SaveImageState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(40.dp),
+                    color = MomentoTheme.colors.brownW20,
+                    strokeWidth = 4.dp
+                )
+            }
+        }
+        is SaveImageState.Success -> { onFinish() }
+        is SaveImageState.Error -> {}
+        else -> {
+            // Init 또는 Success
         }
     }
 }
