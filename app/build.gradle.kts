@@ -11,6 +11,13 @@ if (propertiesFile.exists()) {
     propertiesFile.inputStream().use { properties.load(it) }
 }
 
+// CI/CD 서명 설정 파일 로드
+val signingProps = Properties()
+val signingPropsFile = project.rootProject.file("signing.properties")
+if (signingPropsFile.exists()) {
+    signingPropsFile.inputStream().use { signingProps.load(it) }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -49,6 +56,16 @@ android {
         buildConfigField("String", "NAVER_CLIENT_SECRET", "\"${naverClientSecret}\"")
     }
 
+    // CI/CD 서명 설정
+    signingConfigs {
+        create("release") {
+            storeFile = if (signingProps.containsKey("storeFile")) file("app/${signingProps["storeFile"] as String}") else null
+            storePassword = signingProps["storePassword"] as String?
+            keyAlias = signingProps["keyAlias"] as String?
+            keyPassword = signingProps["keyPassword"] as String?
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -56,14 +73,16 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // release 빌드 타입에 서명 설정 적용
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
