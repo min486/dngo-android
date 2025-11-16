@@ -16,6 +16,11 @@ jobs:
       KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
+      GOOGLE_SERVICES_BASE64: ${{ secrets.GOOGLE_SERVICES_BASE64 }}
+      KAKAO_NATIVE_APP_KEY: ${{ secrets.KAKAO_NATIVE_APP_KEY }}
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -28,6 +33,15 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
+      - name: Decode Google Services File
+        run: echo "$GOOGLE_SERVICES_BASE64" | base64 -d > app/google-services.json
+
+      - name: Create local.properties for CI
+        run: |
+          echo "kakao.native.app.key=$KAKAO_NATIVE_APP_KEY" > local.properties
+          echo "naver.client.id=$NAVER_CLIENT_ID" >> local.properties
+          echo "naver.client.secret=$NAVER_CLIENT_SECRET" >> local.properties
 
       # Secrets에서 Base64 문자열을 디코딩하여 app/keystore.jks 파일로 저장
       - name: Decode Keystore File
