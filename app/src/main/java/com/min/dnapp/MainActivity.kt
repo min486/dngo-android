@@ -1,0 +1,147 @@
+package com.min.dnapp
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.min.dnapp.presentation.AppStartViewModel
+import com.min.dnapp.presentation.bell.BellScreen
+import com.min.dnapp.presentation.find.FindDetailScreen
+import com.min.dnapp.presentation.find.FindScreen
+import com.min.dnapp.presentation.home.HomeScreen2
+import com.min.dnapp.presentation.login.LoginScreen2
+import com.min.dnapp.presentation.mypage.MyRecordScreen
+import com.min.dnapp.presentation.mypage.MypageScreen
+import com.min.dnapp.presentation.mypage.SettingScreen
+import com.min.dnapp.presentation.navigation.AppInitHost
+import com.min.dnapp.presentation.ui.component.MomentoBottomNav
+import com.min.dnapp.presentation.ui.theme.DngoTheme
+import com.min.dnapp.presentation.write.RecordWriteScreen
+import com.min.dnapp.presentation.write.WriteFinishScreen
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // 스플래시 화면 설정
+        val splashScreen = installSplashScreen()
+
+        super.onCreate(savedInstanceState)
+
+        // 콘텐츠를 화면 끝까지 확장 (Insets 처리는 Composable에게 맡기기)
+        enableEdgeToEdge()
+
+        setContent {
+            DngoTheme {
+                MomentoApp()
+            }
+        }
+    }
+}
+
+@Composable
+fun MomentoApp(
+    appStartViewModel: AppStartViewModel = hiltViewModel()
+) {
+    val isLogin by appStartViewModel.isLogin.collectAsStateWithLifecycle()
+    val startDestination = if (isLogin) "init_host" else "login"
+
+    // root navigation 담당
+    val navController = rememberNavController()
+
+    // root navigation 경로
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route ?: startDestination
+
+    val showBottomBar = when (currentRoute) {
+        "home", "find", "my" -> true
+        else -> false
+    }
+
+    Scaffold(
+        // Padding 중복을 막기 위해 모든 Insets 차단
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        bottomBar = {
+            if (showBottomBar) {
+                MomentoBottomNav(
+                    currentRoute = currentRoute,
+                    onNavItemClick = { route ->
+                        // 현재 경로와 다를때만 navigate 호출
+                        if (navController.currentDestination?.route != route) {
+                            navController.navigate(route)
+                        }
+                    }
+                )
+            }
+        }
+    ) { paddingValues ->
+        NavHost(
+            modifier = Modifier.padding(paddingValues),
+            navController = navController,
+            startDestination = startDestination
+        ) {
+            composable("login") {
+                LoginScreen2(
+                    navController = navController,
+                    onLoginSuccess = {
+                        navController.navigate("init_host") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable("init_host") {
+                AppInitHost(
+                    onInitComplete = {
+                        navController.navigate("home") {
+                            popUpTo("init_host") { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable("home") {
+                HomeScreen2(navController = navController)
+            }
+            composable("find") {
+                FindScreen(navController = navController)
+            }
+            composable("my") {
+                MypageScreen(navController = navController)
+            }
+
+            composable("bell") {
+                BellScreen(navController = navController)
+            }
+            composable("find_detail") {
+                FindDetailScreen(navController = navController)
+            }
+            composable("record_write") {
+                RecordWriteScreen(navController = navController)
+            }
+            composable("write_finish") {
+                WriteFinishScreen(navController = navController)
+            }
+            composable("my_record") {
+                MyRecordScreen(navController = navController)
+            }
+            composable("setting") {
+                SettingScreen(navController = navController)
+            }
+        }
+    }
+}
