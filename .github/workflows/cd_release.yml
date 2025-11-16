@@ -74,6 +74,4 @@ jobs:
         with:
           # 빌드된 AAB 파일 업로드
           files: app/build/outputs/bundle/release/app-release.aab
-          name: Release ${{ github.ref_name }}
-          body: |
-            더 나은 모멘토를 위해 버그를 수정하고, 사용성을 개선했어요
+          name: ${{ github.ref_name }}
