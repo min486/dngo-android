@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master  # master 브랜치에 push 될 때 실행
+    tags:
+      - 'v*'
 
 jobs:
   release:
