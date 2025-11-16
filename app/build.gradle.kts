@@ -59,7 +59,7 @@ android {
     // CI/CD 서명 설정
     signingConfigs {
         create("release") {
-            storeFile = if (signingProps.containsKey("storeFile")) file("app/${signingProps["storeFile"] as String}") else null
+            storeFile = if (signingProps.containsKey("storeFile")) file(signingProps["storeFile"] as String) else null
             storePassword = signingProps["storePassword"] as String?
             keyAlias = signingProps["keyAlias"] as String?
             keyPassword = signingProps["keyPassword"] as String?
