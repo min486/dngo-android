@@ -134,8 +134,17 @@ dependencies {
     implementation(libs.lottie.compose)
     // preferences datastore
     implementation(libs.datastore.preferences)
+    // coroutines
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.android)
 
+    // Unit Test
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.hilt.android.testing)
+
+    // Device/Emulator Test
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.ui.test.junit4)
