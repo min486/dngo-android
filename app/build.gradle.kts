@@ -139,15 +139,15 @@ dependencies {
     implementation(libs.coroutines.android)
 
     // Unit Test
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.kotest.assertion)
     testImplementation(libs.mockk)
-    testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
 
-    // Device/Emulator Test
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+// Kotest 사용을 위한 JUnit5 설정
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

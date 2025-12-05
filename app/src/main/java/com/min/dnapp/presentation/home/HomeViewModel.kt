@@ -45,7 +45,7 @@ class HomeViewModel @Inject constructor(
             val successState: HomeUiState.Success
             try {
                 val user = getUserDataUseCase(uid)
-                Log.d("home", "loadHomeData - user: $user")
+//                Log.d("home", "loadHomeData - user: $user")
 
                 successState = mapUserToHomeUiState(user)
 
@@ -58,7 +58,7 @@ class HomeViewModel @Inject constructor(
             // 여행기록 정보 로드 및 상태 업데이트
             try {
                 val userRecords = getUserRecordUseCase()
-                Log.d("home", "loadHomeData - userRecords: $userRecords")
+//                Log.d("home", "loadHomeData - userRecords: $userRecords")
                 val finalSuccessState = successState.copy(
                     records = userRecords
                 )
@@ -67,7 +67,7 @@ class HomeViewModel @Inject constructor(
                 _uiState.value = successState.copy(
                     records = emptyList()
                 )
-                Log.e("home", "기록 정보 로드 실패", e)
+//                Log.e("home", "기록 정보 로드 실패", e)
             }
         }
     }
