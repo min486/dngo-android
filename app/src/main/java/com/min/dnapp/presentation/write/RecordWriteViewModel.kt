@@ -57,7 +57,7 @@ class RecordWriteViewModel @Inject constructor(
      */
     fun updateTitle(newText: String) {
         _uiState.value = _uiState.value.copy(recordTitle = newText)
-        Log.d("write", "updateTitle - newText : $newText")
+//        Log.d("write", "updateTitle - newText : $newText")
     }
 
     /**
@@ -65,7 +65,7 @@ class RecordWriteViewModel @Inject constructor(
      */
     fun updateContent(newText: String) {
         _uiState.value = _uiState.value.copy(recordContent = newText)
-        Log.d("write", "updateContent - newText : $newText")
+//        Log.d("write", "updateContent - newText : $newText")
     }
 
     /**
@@ -83,7 +83,7 @@ class RecordWriteViewModel @Inject constructor(
      */
     fun updateEmotion(emotionType: EmotionType) {
         _uiState.value = _uiState.value.copy(selectedEmotion = emotionType)
-        Log.d("write", "selectEmotion - emotionType : $emotionType")
+//        Log.d("write", "selectEmotion - emotionType : $emotionType")
     }
 
     /**
@@ -91,7 +91,7 @@ class RecordWriteViewModel @Inject constructor(
      */
     fun updateWeather(weatherType: WeatherType) {
         _uiState.value = _uiState.value.copy(selectedWeather = weatherType)
-        Log.d("write", "selectWeather - weatherType : $weatherType")
+//        Log.d("write", "selectWeather - weatherType : $weatherType")
     }
 
     /**
@@ -104,7 +104,7 @@ class RecordWriteViewModel @Inject constructor(
         if (newQuery.isBlank()) {
             // 진행중인 검색 작업 취소
             searchJob?.cancel()
-            Log.d("naver", "updateQuery - newQuery blank")
+//            Log.d("naver", "updateQuery - newQuery blank")
         }
     }
 
@@ -116,7 +116,7 @@ class RecordWriteViewModel @Inject constructor(
 
         // 검색어가 빈 경우
         if (currentQuery.isBlank()) {
-            Log.d("naver", "searchPlace - newQuery blank")
+//            Log.d("naver", "searchPlace - newQuery blank")
             return
         }
 
@@ -131,28 +131,28 @@ class RecordWriteViewModel @Inject constructor(
                         // 로딩 시작
                         _uiState.value = _uiState.value.copy(searchState = _uiState.value.searchState.copy(
                             isLoading = true,
-                            places = result.data ?: emptyList(),
+                            places = emptyList(),
                             error = null
                         ))
-                        Log.d("naver", "search for $currentQuery : Loading...")
+//                        Log.d("naver", "search for $currentQuery : Loading...")
                     }
                     is Resource.Success -> {
                         // 성공
                         _uiState.value = _uiState.value.copy(searchState = _uiState.value.searchState.copy(
                             isLoading = false,
-                            places = result.data ?: emptyList(),
+                            places = result.data,
                             error = null
                         ))
-                        Log.d("naver", "search success : ${result.data?.size} 개")
+//                        Log.d("naver", "search success : ${result.data?.size} 개")
                     }
                     is Resource.Error -> {
                         // 에러
                         _uiState.value = _uiState.value.copy(searchState = _uiState.value.searchState.copy(
                             isLoading = false,
-                            places = result.data ?: emptyList(),
-                            error = result.message ?: "알 수 없는 에러 발생"
+                            places = emptyList(),
+                            error = result.message
                         ))
-                        Log.e("naver", "search error : ${result.message}")
+//                        Log.e("naver", "search error : ${result.message}")
                     }
                 }
             }
@@ -173,7 +173,7 @@ class RecordWriteViewModel @Inject constructor(
             places = emptyList(),
             error = null
         ))
-        Log.d("naver", "result cleared")
+//        Log.d("naver", "result cleared")
     }
 
     /**
@@ -188,7 +188,7 @@ class RecordWriteViewModel @Inject constructor(
      */
     fun updateOverseas(newText: String) {
         _uiState.value = _uiState.value.copy(overseasPlace = newText)
-        Log.d("write", "updateOverseas - newText : $newText")
+//        Log.d("write", "updateOverseas - newText : $newText")
     }
 
     /**
@@ -196,7 +196,7 @@ class RecordWriteViewModel @Inject constructor(
      */
     fun updateShare(newChecked: Boolean) {
         _uiState.value = _uiState.value.copy(isShareChecked = newChecked)
-        Log.d("write", "updateShare - newChecked : $newChecked")
+//        Log.d("write", "updateShare - newChecked : $newChecked")
     }
 
     /**
@@ -218,7 +218,7 @@ class RecordWriteViewModel @Inject constructor(
      */
     fun onPhotoSelected(uri: Uri?) {
         _uiState.value = _uiState.value.copy(selectedImageUri = uri)
-        Log.d("write", "onPhotoSelected - uri : $uri")
+//        Log.d("write", "onPhotoSelected - uri : $uri")
     }
 
     /**
@@ -249,7 +249,7 @@ class RecordWriteViewModel @Inject constructor(
                 _completeSaveRecord.send(Unit)
             }.onFailure { exception ->
                 // 저장 실패
-                Log.e("write", "saveRecord - exception : $exception")
+//                Log.e("write", "saveRecord - exception : $exception")
             }
 
             _uiState.update { it.copy(isSaving = false) }
