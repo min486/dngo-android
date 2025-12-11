@@ -1,5 +1,6 @@
 package com.min.dnapp.presentation.write
 
+import android.net.Uri
 import com.min.dnapp.domain.model.EmotionType
 import com.min.dnapp.domain.model.LocalPlace
 import com.min.dnapp.domain.model.WeatherType
@@ -8,10 +9,14 @@ import com.min.dnapp.domain.usecase.SaveRecordUseCase
 import com.min.dnapp.util.Resource
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestDispatcher
@@ -180,7 +185,7 @@ class RecordWriteViewModelTest : FunSpec({
 
     /**
      * 테스트 7: 검색 결과에서 장소 선택 테스트
-     * 시나리요:
+     * 시나리오:
      * - 검색 결과가 표시됨
      * - 유저가 특정 장소를 선택
      * - 선택된 장소가 UiState에 저장되는지 확인
@@ -197,5 +202,138 @@ class RecordWriteViewModelTest : FunSpec({
 
         viewModel.uiState.value.selectedPlace shouldBe seletedPlace
         viewModel.uiState.value.selectedPlace?.title shouldBe "광안리해수욕장"
+    }
+
+    /**
+     * 테스트 8: 해외 여행지 입력 테스트
+     * 시나리오:
+     * - 유저가 해외 여행지를 직접 입력
+     * - overseasPlace가 UiState에 저장되는지 확인
+     */
+    test("해외 여행지 입력 시 UiState에 저장된다") {
+        viewModel = RecordWriteViewModel(localSearchUseCase, saveRecordUseCase)
+
+        val overseasPlace = "오사카"
+        viewModel.updateOverseas(overseasPlace)
+
+        viewModel.uiState.value.overseasPlace shouldBe "오사카"
+    }
+
+    /**
+     * 테스트 9: 공유 설정 토글 테스트
+     * 시나리오:
+     * - 유저가 공유 스위치를 ON/OFF
+     * - isShareChecked가 UiState에 반영되는지 확인
+     * - 초기값은 true (공유 ON)
+     */
+    test("공유 설정 변경 시 UiState가 업데이트된다") {
+        viewModel = RecordWriteViewModel(localSearchUseCase, saveRecordUseCase)
+        viewModel.uiState.value.isShareChecked shouldBe true
+
+        // 공유 OFF로 변경
+        viewModel.updateShare(false)
+        viewModel.uiState.value.isShareChecked shouldBe false
+
+        // 다시 ON으로 변경
+        viewModel.updateShare(true)
+        viewModel.uiState.value.isShareChecked shouldBe true
+    }
+
+    /**
+     * 테스트 10: 이미지 선택 테스트
+     * 시나리오:
+     * - 유저가 갤러리에서 이미지 선택
+     * - 선택된 이미지의 URI가 UiState에 저장되는지 확인
+     */
+    test("이미지 선택 시 URI가 UiState에 저장된다") {
+        viewModel = RecordWriteViewModel(localSearchUseCase, saveRecordUseCase)
+        val mockUri: Uri = mockk(relaxed = true)
+
+        viewModel.onPhotoSelected(mockUri)
+
+        viewModel.uiState.value.selectedImageUri shouldBe mockUri
+        viewModel.uiState.value.selectedImageUri shouldNotBe null
+    }
+
+    /**
+     * 테스트 11: 기록 저장 성공 테스트
+     * 시나리오:
+     * - 모든 필수 항목이 입력된 상태
+     * - 완료 버튼 클릭해야 기록 저장
+     * - saveRecordUseCase가 호출되는지 확인
+     * - completeSaveRecordFlow에서 이벤트가 발행되는지 확인
+     */
+    test("모든 필수 항목이 입력된 경우 기록 저장이 성공한다") {
+        // saveRecordUseCase가 성공 반환하도록 설정
+        coEvery {
+            saveRecordUseCase(any(), any())
+        } returns Result.success(Unit)
+
+        viewModel = RecordWriteViewModel(localSearchUseCase, saveRecordUseCase)
+
+        // 필수 항목 입력
+        viewModel.updateTitle("부산 여행")
+        viewModel.updateContent("부산 여행 최고")
+        viewModel.updateDateRange(1700000000000L, 1700086400000L)
+        viewModel.updateEmotion(EmotionType.HAPPY)
+        viewModel.updateWeather(WeatherType.SUN)
+        viewModel.updatePlace(
+            LocalPlace(
+                title = "광안리해수욕장",
+                category = "해수욕장,해변",
+                roadAddress = "부산광역시 수영구 광안해변로 219"
+            )
+        )
+
+        // 기록 저장
+        viewModel.saveRecord()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // saveRecordUseCase가 1번 호출되었는지 확인
+        coVerify(exactly = 1) {
+            saveRecordUseCase(any(), any())
+        }
+
+        // 이벤트가 발행되었는지 확인
+        val completeEvent = viewModel.completeSaveRecordFlow.first()
+        completeEvent shouldBe Unit
+    }
+
+    /**
+     * 테스트 12: 필수 항목 누락 시 저장 실패 테스트
+     * 시나리오:
+     * - 필수 항목(제목) 미입력 상태
+     * - 완료 버튼 클릭
+     * - snackbarMessage 발행되는지 확인
+     * - saveRecordUseCase가 호출되지 않는지 확인
+     */
+    test("제목이 빈 경우 저장 실패 하고 메시지가 발행된다") {
+        viewModel = RecordWriteViewModel(localSearchUseCase, saveRecordUseCase)
+
+        // 제목 비워둔 상태
+        viewModel.updateContent("부산 여행 최고")
+        viewModel.updateDateRange(1700000000000L, 1700086400000L)
+        viewModel.updateEmotion(EmotionType.HAPPY)
+        viewModel.updateWeather(WeatherType.SUN)
+        viewModel.updatePlace(
+            LocalPlace(
+                title = "광안리해수욕장",
+                category = "해수욕장,해변",
+                roadAddress = "부산광역시 수영구 광안해변로 219"
+            )
+        )
+
+        // 기록 저장
+        viewModel.saveRecord()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // saveRecordUseCase가 호출되지 않았는지 확인
+        coVerify(exactly = 0) {
+            saveRecordUseCase(any(), any())
+        }
+
+        // 스낵바메시지 확인
+        val snackbarMessage = viewModel.snackbarMessage.first()
+        snackbarMessage.message shouldBe WriteMessage.TITLE_EMPTY
     }
 })

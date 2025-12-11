@@ -42,7 +42,8 @@ class RecordWriteViewModel @Inject constructor(
     private val _completeSaveRecord = Channel<Unit>()
     val completeSaveRecordFlow = _completeSaveRecord.receiveAsFlow()
 
-    private val _snackbarMessage = MutableSharedFlow<SnackbarMessage>()
+    // 최근에 발행된 메시지 1개 저장
+    private val _snackbarMessage = MutableSharedFlow<SnackbarMessage>(replay = 1)
     val snackbarMessage = _snackbarMessage.asSharedFlow()
 
     // 이전 검색 작업을 취소하기 위한 Job
