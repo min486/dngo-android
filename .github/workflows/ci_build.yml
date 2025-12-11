@@ -42,6 +42,19 @@ jobs:
           echo "naver.client.id=$NAVER_CLIENT_ID" >> local.properties
           echo "naver.client.secret=$NAVER_CLIENT_SECRET" >> local.properties
 
+      # Unit Test 실행
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest
+
+      # 테스트 결과 저장
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: app/build/reports/tests/testDebugUnitTest
+          retention-days: 7
+
       - name: Build Debug APK
         run: ./gradlew assembleDebug  # 디버그 APK 빌드 명령어 실행
 
