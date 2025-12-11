@@ -31,7 +31,7 @@ class FindViewModel @Inject constructor(
             // 공유된 기록 목록 가져오기
             try {
                 val sharedRecords = getSharedRecordUseCase()
-                Log.d("record", "loaFindData - sharedRecords: $sharedRecords")
+//                Log.d("record", "loaFindData - sharedRecords: $sharedRecords")
                 val successState = FindUiState.Success(
                     records = sharedRecords
                 )
@@ -40,7 +40,7 @@ class FindViewModel @Inject constructor(
                 _uiState.value = FindUiState.Success(
                     records = emptyList()
                 )
-                Log.e("record", "기록 목록 조회 실패", e)
+//                Log.e("record", "기록 목록 조회 실패", e)
             }
         }
     }

@@ -1,7 +1,5 @@
 package com.min.dnapp.data.repository
 
-import android.net.http.HttpEngine
-import android.util.Log
 import com.min.dnapp.data.remote.LocalSearchResponse
 import com.min.dnapp.data.remote.LocalSearchService
 import com.min.dnapp.domain.model.LocalPlace
@@ -21,7 +19,7 @@ class LocalSearchRepositoryImpl @Inject constructor(
 ) : LocalSearchRepository {
     override fun searchPlaces(query: String): Flow<Resource<List<LocalPlace>>> = flow {
         // 로딩 상태 방출
-        emit(Resource.Loading())
+        emit(Resource.Loading)
 
         try {
             val response: LocalSearchResponse = api.search(

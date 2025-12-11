@@ -134,11 +134,20 @@ dependencies {
     implementation(libs.lottie.compose)
     // preferences datastore
     implementation(libs.datastore.preferences)
+    // coroutines
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.android)
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    // Unit Test
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.kotest.assertion)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+
     debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+// Kotest 사용을 위한 JUnit5 설정
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
